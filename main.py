@@ -14,13 +14,13 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Database Models
 class ProcedureModel(Base):
     __tablename__ = "procedures"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     price = Column(Float)
     gap_days = Column(Integer, default=0)
+    total_sittings = Column(Integer, default=1)
 
 class PatientModel(Base):
     __tablename__ = "patients"
@@ -30,18 +30,20 @@ class PatientModel(Base):
     procedure_id = Column(Integer)
     total_sittings = Column(Integer, default=1)
     current_sitting = Column(Integer, default=1)
+    base_price = Column(Float, default=0.0)
+    discount = Column(Float, default=0.0)
     total_amount = Column(Float)
     total_paid = Column(Float, default=0.0)
     payment_left = Column(Float)
     time_slot = Column(String)
     next_appointment = Column(Date, nullable=True)
     created_date = Column(Date, default=date.today)
+    source = Column(String, default="Website") # Website or Instagram Reel
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SRA Dental Clinic API")
 
-# CORS Setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -50,7 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -58,7 +59,6 @@ def get_db():
     finally:
         db.close()
 
-# --- WEB PAGE ROUTES (Serves your website files directly) ---
 @app.get("/")
 def serve_patient_portal():
     return FileResponse("patient.html")
@@ -67,18 +67,35 @@ def serve_patient_portal():
 def serve_admin_portal():
     return FileResponse("index.html")
 
-# --- API ENDPOINTS ---
 @app.get("/procedures")
 def get_procedures(db: Session = Depends(get_db)):
     procs = db.query(ProcedureModel).all()
     if not procs:
-        # Seed default procedures if empty
         defaults = [
-            ProcedureModel(name="Consultation", price=300, gap_days=0),
-            ProcedureModel(name="Root Canal Treatment", price=3500, gap_days=3),
-            ProcedureModel(name="Dental Implants", price=15000, gap_days=7),
-            ProcedureModel(name="Scaling & Polishing", price=1000, gap_days=0),
-            ProcedureModel(name="Tooth Extraction", price=800, gap_days=0)
+            ProcedureModel(name="RCT ANTERIOR", price=2000, gap_days=3, total_sittings=3),
+            ProcedureModel(name="RCT POSTERIOR", price=2500, gap_days=3, total_sittings=3),
+            ProcedureModel(name="RCT PEDO", price=2000, gap_days=3, total_sittings=3),
+            ProcedureModel(name="CONSULTATION", price=100, gap_days=0, total_sittings=1),
+            ProcedureModel(name="TEMPORARY FILLING", price=100, gap_days=0, total_sittings=1),
+            ProcedureModel(name="GIC FILLING", price=500, gap_days=0, total_sittings=1),
+            ProcedureModel(name="COMPOSITE FILLING", price=1000, gap_days=0, total_sittings=1),
+            ProcedureModel(name="EXTRACTION", price=500, gap_days=2, total_sittings=2),
+            ProcedureModel(name="SURGICAL EXTRACTION", price=3000, gap_days=7, total_sittings=2),
+            ProcedureModel(name="SCALING", price=1000, gap_days=0, total_sittings=1),
+            ProcedureModel(name="METAL CROWN", price=1500, gap_days=3, total_sittings=2),
+            ProcedureModel(name="PFM CROWN", price=2000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="PREMIUM PFM CROWN", price=2500, gap_days=3, total_sittings=2),
+            ProcedureModel(name="DMLS CROWN", price=3000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="ZIRCONIA CROWN 2", price=4000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="ZIRCONIA 5", price=5000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="ZIRCONIA 10", price=6000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="COMPLETE DENTURE", price=10000, gap_days=3, total_sittings=5),
+            ProcedureModel(name="RPD", price=500, gap_days=3, total_sittings=2),
+            ProcedureModel(name="VENEER", price=5000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="LOCAL IMPLANT", price=15000, gap_days=7, total_sittings=3),
+            ProcedureModel(name="KOREAN IMPLANT", price=25000, gap_days=7, total_sittings=3),
+            ProcedureModel(name="PREMIUM DENTURE", price=20000, gap_days=3, total_sittings=5),
+            ProcedureModel(name="ALIGNER", price=70000, gap_days=7, total_sittings=4)
         ]
         db.add_all(defaults)
         db.commit()
@@ -99,10 +116,15 @@ def get_analytics(db: Session = Depends(get_db)):
     month_revenue = sum(p.total_paid for p in patients if p.created_date.month == today.month and p.created_date.year == today.year)
     total_dues = sum(p.payment_left for p in patients)
     
+    reel_leads = sum(1 for p in patients if p.source == "Instagram Reel")
+    web_leads = sum(1 for p in patients if p.source == "Website")
+    
     return {
         "today_revenue": today_revenue,
         "month_revenue": month_revenue,
-        "total_dues": total_dues
+        "total_dues": total_dues,
+        "reel_leads": reel_leads,
+        "web_leads": web_leads
     }
 
 @app.get("/views/appointments")
@@ -112,12 +134,15 @@ def get_appointments(db: Session = Depends(get_db)):
     
     today_list = []
     future_list = []
+    scaling_recall_list = []
+    
+    six_months_ago = today - timedelta(days=180)
     
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
         proc_name = proc.name if proc else "General"
         
-        wa_text = f"Hello {p.patient_name}, this is a reminder for your dental appointment at SRA Dental Clinic today at {p.time_slot}."
+        wa_text = f"Hello {p.patient_name}, reminder for your dental appointment at SRA Dental Clinic today at {p.time_slot}."
         wa_link = f"https://wa.me/91{p.phone_number}?text={wa_text.replace(' ', '%20')}" if p.phone_number else ""
         
         item = {
@@ -128,7 +153,8 @@ def get_appointments(db: Session = Depends(get_db)):
             "time_slot": p.time_slot,
             "pending_payment": p.payment_left,
             "whatsapp_link": wa_link,
-            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None
+            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
+            "source": p.source
         }
         
         if p.next_appointment == today:
@@ -136,7 +162,19 @@ def get_appointments(db: Session = Depends(get_db)):
         elif p.next_appointment and p.next_appointment > today:
             future_list.append(item)
             
-    return {"today": today_list, "future": future_list}
+        # 6-Month Scaling Reminder check
+        if proc_name == "SCALING" and p.created_date <= six_months_ago:
+            scale_text = f"Hello {p.patient_name}, it has been 6 months since your last scaling at SRA Dental Clinic. Time for a routine check-up and scaling!"
+            scale_link = f"https://wa.me/91{p.phone_number}?text={scale_text.replace(' ', '%20')}" if p.phone_number else ""
+            scaling_recall_list.append({
+                "opd_number": p.opd_number,
+                "patient_name": p.patient_name,
+                "phone": p.phone_number,
+                "last_date": p.created_date.isoformat(),
+                "whatsapp_link": scale_link
+            })
+            
+    return {"today": today_list, "future": future_list, "scaling_recall": scaling_recall_list}
 
 class PatientCreate(BaseModel):
     patient_name: str
@@ -144,15 +182,27 @@ class PatientCreate(BaseModel):
     procedure_id: int
     time_slot: str
     payment_done: float
+    discount: float = 0.0
     next_appointment: Optional[str] = None
+    source: str = "Website"
 
 @app.post("/patients")
 def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
+    # Sunday rule check optional warning or error if desired, but let's allow saving with note
+    if data.next_appointment:
+        appt_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date()
+        if appt_date.weekday() == 6: # Sunday
+            # Sunday no revisit rule check
+            pass
+
     count = db.query(PatientModel).count() + 1
     opd_number = f"OPD-{100 + count}"
     
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == data.procedure_id).first()
-    total_amt = proc.price if proc else 0.0
+    base_amt = proc.price if proc else 0.0
+    total_sittings = proc.total_sittings if proc else 1
+    
+    total_amt = max(0.0, base_amt - data.discount)
     payment_left = max(0.0, total_amt - data.payment_done)
     
     next_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
@@ -162,11 +212,15 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
         patient_name=data.patient_name,
         phone_number=data.phone_number,
         procedure_id=data.procedure_id,
+        total_sittings=total_sittings,
+        base_price=base_amt,
+        discount=data.discount,
         total_amount=total_amt,
         total_paid=data.payment_done,
         payment_left=payment_left,
         time_slot=data.time_slot,
-        next_appointment=next_date
+        next_appointment=next_date,
+        source=data.source
     )
     db.add(new_patient)
     db.commit()
@@ -182,8 +236,13 @@ class FollowUpCreate(BaseModel):
 def follow_up(data: FollowUpCreate, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == data.opd_number).first()
     if not patient:
-        raise HTTPException(status_code=404, model_detail="Patient not found")
+        raise HTTPException(status_code=404, detail="Patient not found")
         
+    if data.next_appointment:
+        appt_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date()
+        if appt_date.weekday() == 6:
+            raise HTTPException(status_code=400, detail="Sunday is reserved for new patients only, no follow-ups allowed!")
+
     patient.current_sitting += 1
     patient.total_paid += data.payment_done
     patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
@@ -213,9 +272,12 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "procedure": proc.name if proc else "General",
             "current_sitting": p.current_sitting,
             "total_sittings": p.total_sittings,
-            "payment_done": p.total_paid, # simplified for log view
+            "base_price": p.base_price,
+            "discount": p.discount,
+            "total_amount": p.total_amount,
             "total_paid": p.total_paid,
             "payment_left": p.payment_left,
-            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None
+            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
+            "source": p.source
         })
     return logs
