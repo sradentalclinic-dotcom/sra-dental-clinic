@@ -16,318 +16,65 @@
       --border-gold: rgba(168, 130, 56, 0.22);
       --accent-soft: #F5EFE6;
     }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-cream);
-      color: var(--text-dark);
-      margin: 0;
-      padding: 0;
-      scroll-behavior: smooth;
-    }
-
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 8%;
-      background: rgba(255, 255, 255, 0.95);
-      border-bottom: 1px solid var(--border-gold);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(10px);
-    }
-
-    .brand-title {
-      font-family: 'Cinzel', serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--gold-primary);
-      letter-spacing: 3px;
-      text-decoration: none;
-    }
-
-    .nav-links a {
-      margin-left: 25px;
-      text-decoration: none;
-      color: var(--text-dark);
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--gold-primary); }
-
-    .btn-book-nav {
-      background: var(--text-dark);
-      color: #FFF !important;
-      padding: 10px 20px;
-      border-radius: 6px;
-      border: 1px solid var(--gold-primary);
-    }
-
-    .hero {
-      text-align: center;
-      padding: 100px 20px 80px;
-      background: linear-gradient(180deg, #FFFFFF 0%, var(--bg-cream) 100%);
-      border-bottom: 1px solid var(--border-gold);
-    }
-
-    .hero h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 48px;
-      color: var(--gold-primary);
-      margin: 0 0 15px;
-      letter-spacing: 4px;
-    }
-
-    .hero p {
-      font-size: 18px;
-      color: var(--text-muted);
-      max-width: 650px;
-      margin: 0 auto 30px;
-      line-height: 1.6;
-    }
-
-    .hero-btn {
-      display: inline-block;
-      background: var(--text-dark);
-      color: #FFF;
-      text-decoration: none;
-      padding: 16px 36px;
-      border-radius: 6px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border: 1px solid var(--gold-primary);
-      transition: all 0.3s;
-    }
-
-    .hero-btn:hover { background: var(--gold-primary); box-shadow: 0 6px 20px rgba(168, 130, 56, 0.3); }
-
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-cream); color: var(--text-dark); margin: 0; padding: 0; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; background: rgba(255, 255, 255, 0.95); border-bottom: 1px solid var(--border-gold); position: sticky; top: 0; z-index: 1000; }
+    .brand-title { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; color: var(--gold-primary); letter-spacing: 3px; text-decoration: none; }
+    .nav-links a { margin-left: 25px; text-decoration: none; color: var(--text-dark); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+    .hero { text-align: center; padding: 100px 20px 80px; background: linear-gradient(180deg, #FFFFFF 0%, var(--bg-cream) 100%); border-bottom: 1px solid var(--border-gold); }
+    .hero h1 { font-family: 'Cinzel', serif; font-size: 48px; color: var(--gold-primary); margin: 0 0 15px; letter-spacing: 4px; }
     .section { padding: 80px 8%; }
-    .section-title {
-      font-family: 'Cinzel', serif;
-      text-align: center;
-      font-size: 32px;
-      color: var(--gold-primary);
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-    .section-subtitle {
-      text-align: center;
-      color: var(--text-muted);
-      margin-bottom: 50px;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .facilities-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-    }
-
-    .facility-card {
-      background: var(--card-bg);
-      padding: 35px 25px;
-      border-radius: 12px;
-      border: 1px solid var(--border-gold);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .facility-card:hover { transform: translateY(-5px); }
-    .facility-icon { font-size: 40px; margin-bottom: 15px; }
-    .facility-card h3 { font-family: 'Cinzel', serif; color: var(--gold-primary); margin-bottom: 10px; }
-    .facility-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-
-    .treatments-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-
-    .treatment-item {
-      background: var(--accent-soft);
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border-gold);
-      font-weight: 600;
-      color: var(--text-dark);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .booking-wrapper {
-      max-width: 600px;
-      margin: 0 auto;
-      background: var(--card-bg);
-      padding: 40px;
-      border-radius: 12px;
-      border: 1px solid var(--border-gold);
-      box-shadow: 0 10px 30px rgba(168, 130, 56, 0.08);
-    }
-
+    .section-title { font-family: 'Cinzel', serif; text-align: center; font-size: 32px; color: var(--gold-primary); margin-bottom: 10px; letter-spacing: 2px; }
+    .booking-wrapper { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--border-gold); box-shadow: 0 10px 30px rgba(168, 130, 56, 0.08); }
     label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 16px; }
-    
-    input, select {
-      width: 100%;
-      padding: 14px;
-      margin-top: 6px;
-      background: #FAF9F6;
-      border: 1px solid var(--border-gold);
-      color: var(--text-dark);
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-      outline: none;
-    }
-
-    input:focus, select:focus { border-color: var(--gold-primary); background: #FFF; }
-
-    button.submit-btn {
-      width: 100%;
-      margin-top: 25px;
-      background: var(--text-dark);
-      color: #FFF;
-      border: 1px solid var(--gold-primary);
-      padding: 16px;
-      border-radius: 6px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
+    input, select { width: 100%; padding: 14px; margin-top: 6px; background: #FAF9F6; border: 1px solid var(--border-gold); color: var(--text-dark); border-radius: 6px; box-sizing: border-box; font-size: 14px; outline: none; }
+    button.submit-btn { width: 100%; margin-top: 25px; background: var(--text-dark); color: #FFF; border: 1px solid var(--gold-primary); padding: 16px; border-radius: 6px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
     button.submit-btn:hover { background: var(--gold-primary); }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 30px;
-    }
-
-    .contact-info {
-      background: var(--card-bg);
-      padding: 30px;
-      border-radius: 12px;
-      border: 1px solid var(--border-gold);
-    }
-
-    .contact-info h4 { font-family: 'Cinzel', serif; color: var(--gold-primary); margin-top: 0; font-size: 18px; }
-    .contact-info p, .contact-info a { color: var(--text-muted); font-size: 14px; line-height: 1.8; text-decoration: none; }
-    .contact-info a:hover { color: var(--gold-primary); }
-
-    footer {
-      text-align: center;
-      padding: 30px;
-      background: var(--text-dark);
-      color: #FFF;
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
+    footer { text-align: center; padding: 30px; background: var(--text-dark); color: #FFF; font-size: 12px; letter-spacing: 1px; }
   </style>
 </head>
 <body>
-
   <nav class="navbar">
     <a href="#" class="brand-title">SRA DENTAL</a>
     <div class="nav-links">
-      <a href="#facilities">Facilities</a>
-      <a href="#treatments">Treatments</a>
-      <a href="#contact">Contact</a>
-      <a href="https://instagram.com/sra_dental_dabwali" target="_blank">Instagram</a>
-      <a href="#booking" class="btn-book-nav">Book Appointment</a>
+      <a href="#booking">Book Appointment</a>
     </div>
   </nav>
 
   <section class="hero">
     <h1>SRA DENTAL DABWALI</h1>
-    <p>Experience world-class boutique dentistry, painless root canal treatments, premium zirconia crowns, and advanced dental implants in a sterile, ultra-modern setting.</p>
-    <a href="#booking" class="hero-btn">Reserve Your Visit</a>
-  </section>
-
-  <section class="section" id="facilities">
-    <h2 class="section-title">Clinic Facilities</h2>
-    <div class="section-subtitle">Pinnacle of Comfort, Hygiene & Dental Technology</div>
-    <div class="facilities-grid">
-      <div class="facility-card">
-        <div class="facility-icon">🔬</div>
-        <h3>Digital Diagnostics</h3>
-        <p>Ultra-low radiation digital X-ray technology and high-definition intraoral cameras for accurate diagnosis.</p>
-      </div>
-      <div class="facility-card">
-        <div class="facility-icon">✨</div>
-        <h3>Hospital-Grade Sterilization</h3>
-        <p>Multi-stage Class B autoclave sterilization protocol ensuring 100% patient safety and zero cross-contamination.</p>
-      </div>
-      <div class="facility-card">
-        <div class="facility-icon">🦷</div>
-        <h3>Painless Dentistry</h3>
-        <p>State-of-the-art motorized endodontics for swift, comfortable, single-sitting Root Canal Treatments.</p>
-      </div>
-      <div class="facility-card">
-        <div class="facility-icon">☕</div>
-        <h3>Boutique Patient Lounge</h3>
-        <p>Relaxing, luxurious environment designed to eradicate dental anxiety with personal care attention.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" style="background: #FAF8F5;" id="treatments">
-    <h2 class="section-title">Specialized Treatments</h2>
-    <div class="section-subtitle">Comprehensive Oral Care Under One Roof</div>
-    <div class="treatments-grid">
-      <div class="treatment-item">💎 Dental Implants (Korean & Local)</div>
-      <div class="treatment-item">⚡ Rotary Painless RCT</div>
-      <div class="treatment-item">👑 Premium Zirconia & DMLS Crowns</div>
-      <div class="treatment-item">✨ Cosmetic Veneers & Smile Design</div>
-      <div class="treatment-item">🦷 Complete & Flexible Dentures</div>
-      <div class="treatment-item">🧼 Ultrasonic Teeth Scaling</div>
-      <div class="treatment-item">🌟 Composite Tooth Colored Fillings</div>
-      <div class="treatment-item">🛠️ Surgical Tooth Extractions</div>
-    </div>
+    <p>Luxury Boutique Dental & Implant Centre. Experience painless root canals, advanced implants, and precision care.</p>
   </section>
 
   <section class="section" id="booking">
     <h2 class="section-title">Book An Appointment</h2>
-    <div class="section-subtitle">Select your preferred date & time for consultation</div>
     <div class="booking-wrapper">
       <label>Your Full Name</label>
-      <input type="text" id="custName" placeholder="e.g. Ananya Sharma">
+      <input type="text" id="custName" placeholder="e.g. Rahul Kumar">
 
       <label>Phone Number</label>
       <input type="tel" id="custPhone" placeholder="e.g. 7015070153">
 
-      <label>Select Desired Treatment</label>
-      <select id="custProc">
-        <option value="">-- Choose Procedure --</option>
-      </select>
+      <label>Select Treatment</label>
+      <select id="custProc"></select>
 
       <label>Preferred Date</label>
       <input type="date" id="custDate">
 
-      <label>Preferred Time Slot</label>
+      <label>Time Slot</label>
       <select id="custTime">
-        <optgroup label="Morning Shift">
-          <option value="10:00 AM">10:00 AM</option>
-          <option value="11:00 AM">11:00 AM</option>
-          <option value="12:00 PM">12:00 PM</option>
-          <option value="01:00 PM">01:00 PM</option>
-        </optgroup>
-        <optgroup label="Evening Shift">
-          <option value="04:30 PM">04:30 PM</option>
-          <option value="05:30 PM">05:30 PM</option>
-          <option value="06:30 PM">06:30 PM</option>
-        </optgroup>
+        <option value="10:00 AM">10:00 AM</option>
+        <option value="11:00 AM">11:00 AM</option>
+        <option value="12:00 PM">12:00 PM</option>
+        <option value="01:00 PM">01:00 PM</option>
+        <option value="04:30 PM">04:30 PM</option>
+        <option value="05:30 PM">05:30 PM</option>
+        <option value="06:30 PM">06:30 PM</option>
+      </select>
+
+      <label>How did you find us?</label>
+      <select id="custSource">
+        <option value="Website">Website</option>
+        <option value="Instagram Reel">Instagram Reel</option>
       </select>
 
       <button class="submit-btn" onclick="submitPublicBooking()">Confirm Booking Request</button>
@@ -335,36 +82,7 @@
     </div>
   </section>
 
-  <section class="section" style="background: #FAF8F5;" id="contact">
-    <h2 class="section-title">Visit Our Clinic</h2>
-    <div class="section-subtitle">Located conveniently in Mandi Dabwali</div>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h4>📍 Address</h4>
-        <p><b>SRA Dental Clinic</b><br>Near Punjab Bus Stand,<br>Mandi Dabwali, Haryana</p>
-      </div>
-      <div class="contact-info">
-        <h4>📞 Phone & WhatsApp</h4>
-        <p><b>Mobile:</b> <a href="tel:7015070153">+91 7015070153</a><br><b>WhatsApp:</b> <a href="https://wa.me/917015070153" target="_blank">Chat with us</a></p>
-      </div>
-      <div class="contact-info">
-        <h4>📸 Instagram</h4>
-        <p><a href="https://instagram.com/sra_dental_dabwali" target="_blank"><b>@sra_dental_dabwali</b></a><br>Follow us for smile transformations & tips!</p>
-      </div>
-      <div class="contact-info">
-        <h4>⏰ Clinic Hours</h4>
-        <p>
-          <b>Mon – Sat (Morning):</b> 10:00 AM – 02:00 PM<br>
-          <b>Mon – Sat (Evening):</b> 04:30 PM – 07:00 PM<br>
-          <b>Sunday:</b> 11:00 AM – 02:00 PM
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    © SRA Dental Clinic, Mandi Dabwali. All Rights Reserved.
-  </footer>
+  <footer>© SRA Dental Clinic, Mandi Dabwali. All Rights Reserved.</footer>
 
   <script>
     const API_URL = "";
@@ -390,6 +108,7 @@
       const procedure_id = parseInt(document.getElementById('custProc').value);
       const preferred_date = document.getElementById('custDate').value;
       const preferred_time = document.getElementById('custTime').value;
+      const source = document.getElementById('custSource').value;
       const statusDiv = document.getElementById('bookingStatus');
 
       if (!patient_name || !phone_number || !procedure_id || !preferred_date) {
@@ -403,16 +122,13 @@
         const res = await fetch(`${API_URL}/patients`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ patient_name, phone_number, procedure_id, time_slot: preferred_time, payment_done: 0, next_appointment: preferred_date })
+          body: JSON.stringify({ patient_name, phone_number, procedure_id, time_slot: preferred_time, payment_done: 0, discount: 0, next_appointment: preferred_date, source })
         });
 
         const data = await res.json();
         statusDiv.innerHTML = `✅ Appointment requested successfully! Your OPD Reference Number is <b>${data.opd_number}</b>.`;
-
-        document.getElementById('custName').value = '';
-        document.getElementById('custPhone').value = '';
       } catch (err) {
-        statusDiv.innerText = "❌ Unable to connect to clinic system. Please call us directly at 7015070153.";
+        statusDiv.innerText = "❌ Unable to connect to clinic system. Please call 7015070153.";
       }
     }
   </script>
