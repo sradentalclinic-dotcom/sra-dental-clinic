@@ -117,7 +117,7 @@
         <div id="dynamicTreatmentArea" class="hidden">
           <div class="p-4 rounded-xl bg-slate-100 text-slate-800 font-bold text-sm mb-6 flex justify-between items-center" id="treatPatientInfo"></div>
 
-          <!-- NEW: Clinical Records Charting Section -->
+          <!-- Clinical Records Charting Section -->
           <div class="p-6 rounded-2xl bg-white border border-teal-200 shadow-sm mb-6">
             <h3 class="font-bold text-teal-900 mb-4 text-sm uppercase tracking-wider border-b border-teal-100 pb-2">New Clinical Entry (RCT / Extraction)</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -163,7 +163,7 @@
             </div>
           </div>
 
-          <!-- NEW: X-Ray / File Upload Section -->
+          <!-- X-Ray / File Upload Section -->
           <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 mb-6">
             <h3 class="font-bold text-slate-900 mb-4 text-sm uppercase tracking-wider">File & X-Ray Upload</h3>
             <div class="flex gap-4 items-end flex-wrap">
@@ -349,7 +349,6 @@
       document.getElementById('labCostDisplay').innerText = `₹${(LAB_RATES[item] || 0) * units}`;
     }
 
-    // --- NEW: Handle Clinical Stages Dropdown Logic ---
     function updateClinicalStages() {
       const proc = document.getElementById('clinProc').value;
       const stageSelect = document.getElementById('clinStage');
@@ -405,11 +404,9 @@
         
         document.getElementById('dynamicTreatmentArea').classList.remove('hidden');
         
-        // Show basic info and X-ray path if exists
         let xrayHtml = patient.xray_path ? `<a href="${patient.xray_path}" target="_blank" class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs hover:bg-teal-200">View X-Ray</a>` : '';
         document.getElementById('treatPatientInfo').innerHTML = `<div>Patient: <b>${patient.patient_name}</b> | OPD: <b>${patient.opd_number}</b> | Procedure: <b>${patient.procedure_name} (${patient.units} Units)</b></div> ${xrayHtml}`;
 
-        // Populate Edit Financials
         document.getElementById('editName').value = patient.patient_name;
         document.getElementById('editName').setAttribute('data-baseprice', patient.base_price);
         document.getElementById('editAge').value = patient.age || '';
@@ -420,7 +417,6 @@
         document.getElementById('editDiscount').value = patient.discount;
         updateEditCalculations();
 
-        // Populate Clinical Records Table
         const tbody = document.getElementById('clinicalRecordsTable');
         tbody.innerHTML = '';
         if (patient.clinical_records && patient.clinical_records.length > 0) {
@@ -440,7 +436,6 @@
       } catch (e) { console.error("Error loading patient", e); }
     }
 
-    // --- NEW: Save Clinical Record Function ---
     async function saveClinicalRecord() {
       const opd = document.getElementById('treatOpd').value;
       const payload = {
@@ -459,12 +454,11 @@
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(payload)
         });
-        document.getElementById('clinDetails').value = ''; // clear text area
-        loadTreatmentDetails(); // refresh table
+        document.getElementById('clinDetails').value = ''; 
+        loadTreatmentDetails(); 
       } catch (e) { alert("Failed to save clinical record."); }
     }
 
-    // --- NEW: Upload Treatment File Function ---
     async function uploadTreatmentFile() {
       const opd = document.getElementById('treatOpd').value;
       const fileInput = document.getElementById('uploadFile');
