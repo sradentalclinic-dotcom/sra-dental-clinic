@@ -43,6 +43,7 @@ class PatientModel(Base):
     payment_left = Column(Float)
     time_slot = Column(String)
     next_appointment = Column(Date, nullable=True)
+    next_appointment_time = Column(String, nullable=True)  # ADDED NEXT APPOINTMENT TIME
     created_date = Column(Date, default=date.today)
     source = Column(String, default="Website")
     xray_path = Column(String, nullable=True)
@@ -135,6 +136,7 @@ class PatientCreate(BaseModel):
     payment_done: float
     discount: float = 0.0
     next_appointment: Optional[str] = None
+    next_appointment_time: Optional[str] = None  # ADDED FIELD
     source: str = "Website"
     extracted_tooth: Optional[str] = None
     operatory_chair: Optional[str] = "Operatory 1"
@@ -164,6 +166,7 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
         payment_left=payment_left,
         time_slot=data.time_slot,
         next_appointment=next_date,
+        next_appointment_time=data.next_appointment_time,
         source=data.source,
         extracted_tooth=data.extracted_tooth,
         operatory_chair=data.operatory_chair,
@@ -220,7 +223,7 @@ async def upload_treatment_file(
 class EndoSaveRequest(BaseModel):
     opd_number: str
     tooth_number: str
-    canals_data: str  # JSON formatted hand-typed entries
+    canals_data: str
 
 @app.post("/patients/endo-chart")
 def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
@@ -255,7 +258,8 @@ def get_appointments(db: Session = Depends(get_db)):
             "time_slot": p.time_slot,
             "pending_payment": p.payment_left,
             "operatory_chair": p.operatory_chair,
-            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None
+            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
+            "next_appointment_time": p.next_appointment_time
         }
         if p.next_appointment == today:
             today_list.append(item)
@@ -277,6 +281,7 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "opd_number": p.opd_number,
             "date": p.created_date.isoformat(),
             "patient_name": p.patient_name,
+            "phone": p.phone_number,
             "patient_place": p.patient_place,
             "procedure": proc.name if proc else "General",
             "current_sitting": p.current_sitting,
