@@ -27,7 +27,7 @@ class PatientModel(Base):
     opd_number = Column(String, primary_key=True, index=True)
     patient_name = Column(String)
     phone_number = Column(String)
-    patient_place = Column(String, default="")
+    patient_place = Column(String, default="Mandi Dabwali")
     procedure_id = Column(Integer)
     total_sittings = Column(Integer, default=1)
     current_sitting = Column(Integer, default=1)
@@ -39,12 +39,11 @@ class PatientModel(Base):
     time_slot = Column(String)
     next_appointment = Column(Date, nullable=True)
     created_date = Column(Date, default=date.today)
-    source = Column(String, default="Walkin")
+    source = Column(String, default="Website")
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SRA Dental Clinic API")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -101,17 +100,7 @@ def get_procedures(db: Session = Depends(get_db)):
         db.add_all(defaults)
         db.commit()
         procs = db.query(ProcedureModel).all()
-        
-    return [
-        {
-            "id": p.id,
-            "name": p.name,
-            "price": p.price,
-            "gap_days": p.gap_days,
-            "total_sittings": p.total_sittings
-        }
-        for p in procs
-    ]
+    return [{"id": p.id, "name": p.name, "price": p.price, "gap_days": p.gap_days, "total_sittings": p.total_sittings} for p in procs]
 
 @app.get("/calculate-next-date")
 def calculate_next_date(gap_days: int = Query(...)):
@@ -122,23 +111,20 @@ def calculate_next_date(gap_days: int = Query(...)):
 def get_analytics(db: Session = Depends(get_db)):
     today = date.today()
     patients = db.query(PatientModel).all()
-    
     today_revenue = sum(p.total_paid for p in patients if p.created_date == today)
     month_revenue = sum(p.total_paid for p in patients if p.created_date.month == today.month and p.created_date.year == today.year)
     total_dues = sum(p.payment_left for p in patients)
-    
-    referral_leads = sum(1 for p in patients if p.source == "Referral")
-    insta_leads = sum(1 for p in patients if p.source == "Insta")
-    google_leads = sum(1 for p in patients if p.source == "Google")
-    walkin_leads = sum(1 for p in patients if p.source == "Walkin")
-    
+    reel_leads = sum(1 for p in patients if p.source == "Instagram Reel")
+    web_leads = sum(1 for p in patients if p.source == "Website")
+    referral_leads = sum(1 for p in patients if p.source == "Patient Referral")
+    walkin_leads = sum(1 for p in patients if p.source == "Walk-in")
     return {
         "today_revenue": today_revenue,
         "month_revenue": month_revenue,
         "total_dues": total_dues,
+        "reel_leads": reel_leads,
+        "web_leads": web_leads,
         "referral_leads": referral_leads,
-        "insta_leads": insta_leads,
-        "google_leads": google_leads,
         "walkin_leads": walkin_leads
     }
 
@@ -146,17 +132,14 @@ def get_analytics(db: Session = Depends(get_db)):
 def get_appointments(db: Session = Depends(get_db)):
     today = date.today()
     patients = db.query(PatientModel).all()
-    
     today_list = []
     future_list = []
     scaling_recall_list = []
-    
     six_months_ago = today - timedelta(days=180)
-    
+
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
         proc_name = proc.name if proc else "General"
-        
         wa_text = f"Hello {p.patient_name}, reminder for your dental appointment at SRA Dental Clinic today at {p.time_slot}."
         wa_link = f"https://wa.me/91{p.phone_number}?text={wa_text.replace(' ', '%20')}" if p.phone_number else ""
         
@@ -172,12 +155,12 @@ def get_appointments(db: Session = Depends(get_db)):
             "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
             "source": p.source
         }
-        
+
         if p.next_appointment == today:
             today_list.append(item)
         elif p.next_appointment and p.next_appointment > today:
             future_list.append(item)
-            
+
         if proc_name == "SCALING" and p.created_date <= six_months_ago:
             scale_text = f"Hello {p.patient_name}, it has been 6 months since your last scaling at SRA Dental Clinic. Time for a routine check-up and scaling!"
             scale_link = f"https://wa.me/91{p.phone_number}?text={scale_text.replace(' ', '%20')}" if p.phone_number else ""
@@ -189,33 +172,30 @@ def get_appointments(db: Session = Depends(get_db)):
                 "last_date": p.created_date.isoformat(),
                 "whatsapp_link": scale_link
             })
-            
+
     return {"today": today_list, "future": future_list, "scaling_recall": scaling_recall_list}
 
 class PatientCreate(BaseModel):
     patient_name: str
     phone_number: str
-    patient_place: str = ""
+    patient_place: Optional[str] = "Mandi Dabwali"
     procedure_id: int
     time_slot: str
     payment_done: float
     discount: float = 0.0
     next_appointment: Optional[str] = None
-    source: str = "Walkin"
+    source: str = "Website"
 
 @app.post("/patients")
 def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     count = db.query(PatientModel).count() + 1
     opd_number = f"OPD-{100 + count}"
-    
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == data.procedure_id).first()
     base_amt = proc.price if proc else 0.0
-    
     total_amt = max(0.0, base_amt - data.discount)
     payment_left = max(0.0, total_amt - data.payment_done)
-    
     next_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
-    
+
     new_patient = PatientModel(
         opd_number=opd_number,
         patient_name=data.patient_name,
@@ -247,7 +227,6 @@ def follow_up(data: FollowUpCreate, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == data.opd_number).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
-        
     if data.next_appointment:
         appt_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date()
         if appt_date.weekday() == 6:
@@ -258,7 +237,6 @@ def follow_up(data: FollowUpCreate, db: Session = Depends(get_db)):
     patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
     patient.time_slot = data.time_slot
     patient.next_appointment = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
-    
     db.commit()
     return {"message": "Follow-up logged"}
 
@@ -269,8 +247,8 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
         query = query.filter(
             (PatientModel.patient_name.contains(search)) |
             (PatientModel.phone_number.contains(search)) |
-            (PatientModel.patient_place.contains(search)) |
-            (PatientModel.opd_number.contains(search))
+            (PatientModel.opd_number.contains(search)) |
+            (PatientModel.patient_place.contains(search))
         )
     patients = query.all()
     logs = []
@@ -280,6 +258,7 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "opd_number": p.opd_number,
             "date": p.created_date.isoformat(),
             "patient_name": p.patient_name,
+            "phone_number": p.phone_number,
             "patient_place": p.patient_place,
             "procedure": proc.name if proc else "General",
             "current_sitting": p.current_sitting,
