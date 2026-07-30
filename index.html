@@ -112,7 +112,6 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
-    .form-full { grid-column: span 3; }
     .form-half { grid-column: span 1.5; }
 
     label {
@@ -147,13 +146,13 @@
       background: var(--gold-primary);
       color: #FFF;
       border: none;
-      padding: 14px 28px;
+      padding: 12px 24px;
       border-radius: 6px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       transition: var(--transition);
     }
     .btn-gold:hover { background: var(--gold-dark); }
@@ -196,21 +195,9 @@
       color: var(--gold-dark);
       border: 1px solid var(--border-gold);
     }
-    .whatsapp-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #25D366;
-      color: #FFF;
-      padding: 6px 12px;
-      border-radius: 4px;
-      text-decoration: none;
-      font-size: 11px;
-      font-weight: 600;
-    }
     .xray-preview {
-      max-width: 80px;
-      max-height: 80px;
+      max-width: 60px;
+      max-height: 60px;
       border-radius: 4px;
       border: 1px solid var(--border-gold);
     }
@@ -285,6 +272,7 @@
               <option value="46">Tooth 46 (Mandibular 1st Molar - 3/4 Canals)</option>
               <option value="11">Tooth 11 (Maxillary Central Incisor - 1 Canal)</option>
               <option value="21">Tooth 21 (Maxillary Central Incisor - 1 Canal)</option>
+              <option value="34">Tooth 34 (Mandibular Premolar - 1/2 Canals)</option>
             </select>
           </div>
           <div><label>Upload X-Ray Image</label><input type="file" id="xrayFile" accept="image/*"></div>
@@ -319,7 +307,7 @@
         <div style="margin-bottom: 20px;"><input type="text" id="searchInput" placeholder="Search by name, phone, OPD, location, or extracted tooth..." oninput="loadDailyLogs()"></div>
         <div class="table-container">
           <table>
-            <thead><tr><th>OPD</th><th>Date</th><th>Name & Phone</th><th>Location</th><th>Procedure</th><th>Ext. Tooth</th><th>Sitting</th><th>Total</th><th>Paid</th><th>Due</th><th>X-Ray</th><th>Source</th></tr></thead>
+            <thead><tr><th>OPD</th><th>Date</th><th>Name & Phone</th><th>Location</th><th>Procedure</th><th>Ext. Tooth</th><th>Sitting</th><th>Total</th><th>Paid</th><th>Due</th><th>X-Ray</th><th>Actions</th></tr></thead>
             <tbody id="logsTable"></tbody>
           </table>
         </div>
@@ -433,6 +421,15 @@
       container.dataset.canals = JSON.stringify(canals);
     }
 
+    function openEndoForPatient(opdNumber) {
+      document.getElementById('endoOpd').value = opdNumber;
+      // Switch to Endo tab programmatically
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('endo').classList.add('active');
+      // Highlight nav button if desired
+    }
+
     async function uploadXrayImage() {
       const opd = document.getElementById('endoOpd').value;
       const fileInput = document.getElementById('xrayFile');
@@ -464,7 +461,7 @@
       const data = await res.json();
       let todayHtml = '';
       data.today.forEach(i => {
-        todayHtml += `<tr><td><span class="badge">${i.opd_number}</span></td><td><b>${i.patient_name}</b></td><td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.extracted_tooth ? `<span class="badge" style="background:#FEF3C7;color:#92400E;">Tooth ${i.extracted_tooth}</span>` : '-'}</td><td>${i.time_slot}</td><td style="color:#B91C1C;font-weight:700;">₹${i.pending_payment}</td><td><a href="${i.whatsapp_link}" class="whatsapp-btn" target="_blank">WhatsApp</a></td></tr>`;
+        todayHtml += `<tr><td><span class="badge">${i.opd_number}</span></td><td><b>${i.patient_name}</b></td><td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.extracted_tooth ? `<span class="badge" style="background:#FEF3C7;color:#92400E;">Tooth ${i.extracted_tooth}</span>` : '-'}</td><td>${i.time_slot}</td><td style="color:#B91C1C;font-weight:700;">₹${i.pending_payment}</td><td><a href="${i.whatsapp_link}" style="background:#25D366;color:#FFF;padding:6px 12px;border-radius:4px;text-decoration:none;font-size:11px;font-weight:600;" target="_blank">WhatsApp</a></td></tr>`;
       });
       document.getElementById('todayApptTable').innerHTML = todayHtml || `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No appointments today.</td></tr>`;
     }
@@ -490,7 +487,7 @@
           <td style="color:#15803D;font-weight:700;">₹${p.total_paid}</td>
           <td style="color:#B91C1C;font-weight:700;">₹${p.payment_left}</td>
           <td>${xrayHtml}</td>
-          <td><span class="badge">${p.source}</span></td>
+          <td><button class="btn-gold" style="padding:6px 10px; font-size:10px;" onclick="openEndoForPatient('${p.opd_number}')">🦷 Manage Endo</button></td>
         </tr>`;
       });
       document.getElementById('logsTable').innerHTML = html || `<tr><td colspan="12" style="text-align:center; color:var(--text-muted);">No records found.</td></tr>`;
