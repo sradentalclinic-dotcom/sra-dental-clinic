@@ -124,18 +124,14 @@ def get_analytics(db: Session = Depends(get_db)):
     today_revenue = sum(p.total_paid for p in patients if p.created_date == today)
     month_revenue = sum(p.total_paid for p in patients if p.created_date.month == today.month and p.created_date.year == today.year)
     total_dues = sum(p.payment_left for p in patients)
-    reel_leads = sum(1 for p in patients if p.source == "Instagram Reel")
-    web_leads = sum(1 for p in patients if p.source == "Website")
-    referral_leads = sum(1 for p in patients if p.source == "Patient Referral")
-    walkin_leads = sum(1 for p in patients if p.source == "Walk-in")
     return {
         "today_revenue": today_revenue,
         "month_revenue": month_revenue,
         "total_dues": total_dues,
-        "reel_leads": reel_leads,
-        "web_leads": web_leads,
-        "referral_leads": referral_leads,
-        "walkin_leads": walkin_leads
+        "reel_leads": sum(1 for p in patients if p.source == "Instagram Reel"),
+        "web_leads": sum(1 for p in patients if p.source == "Website"),
+        "referral_leads": sum(1 for p in patients if p.source == "Patient Referral"),
+        "walkin_leads": sum(1 for p in patients if p.source == "Walk-in")
     }
 
 @app.get("/views/appointments")
@@ -144,8 +140,6 @@ def get_appointments(db: Session = Depends(get_db)):
     patients = db.query(PatientModel).all()
     today_list = []
     future_list = []
-    scaling_recall_list = []
-    six_months_ago = today - timedelta(days=180)
 
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
@@ -163,7 +157,6 @@ def get_appointments(db: Session = Depends(get_db)):
             "pending_payment": p.payment_left,
             "whatsapp_link": wa_link,
             "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
-            "source": p.source,
             "extracted_tooth": p.extracted_tooth
         }
 
@@ -172,19 +165,7 @@ def get_appointments(db: Session = Depends(get_db)):
         elif p.next_appointment and p.next_appointment > today:
             future_list.append(item)
 
-        if proc_name == "SCALING" and p.created_date <= six_months_ago:
-            scale_text = f"Hello {p.patient_name}, it has been 6 months since your last scaling at SRA Dental Clinic. Time for a routine check-up and scaling!"
-            scale_link = f"https://wa.me/91{p.phone_number}?text={scale_text.replace(' ', '%20')}" if p.phone_number else ""
-            scaling_recall_list.append({
-                "opd_number": p.opd_number,
-                "patient_name": p.patient_name,
-                "phone": p.phone_number,
-                "patient_place": p.patient_place,
-                "last_date": p.created_date.isoformat(),
-                "whatsapp_link": scale_link
-            })
-
-    return {"today": today_list, "future": future_list, "scaling_recall": scaling_recall_list}
+    return {"today": today_list, "future": future_list, "scaling_recall": []}
 
 class PatientCreate(BaseModel):
     patient_name: str
@@ -258,6 +239,11 @@ def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
         db.add(chart)
     db.commit()
     return {"message": "Endo chart saved successfully"}
+
+@app.get("/patients/{opd_number}/endo-chart")
+def get_endo_chart(opd_number: str, db: Session = Depends(get_db)):
+    charts = db.query(EndoChartModel).filter(EndoChartModel.opd_number == opd_number).all()
+    return [{"tooth_number": c.tooth_number, "canals_data": c.canals_data} for c in charts]
 
 @app.get("/views/daily-log")
 def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
