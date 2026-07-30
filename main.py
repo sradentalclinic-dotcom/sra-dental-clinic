@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from typing import Optional
 import os
-from fastapi import FastAPI, HTTPException, Query, Depends, UploadFile, File
+from fastapi import FastAPI, HTTPException, Query, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -92,25 +92,11 @@ def get_procedures(db: Session = Depends(get_db)):
             ProcedureModel(name="RCT PEDO", price=2000, gap_days=3, total_sittings=3),
             ProcedureModel(name="CONSULTATION", price=100, gap_days=0, total_sittings=1),
             ProcedureModel(name="TEMPORARY FILLING", price=100, gap_days=0, total_sittings=1),
-            ProcedureModel(name="GIC FILLING", price=500, gap_days=0, total_sittings=1),
-            ProcedureModel(name="COMPOSITE FILLING", price=1000, gap_days=0, total_sittings=1),
             ProcedureModel(name="EXTRACTION", price=500, gap_days=2, total_sittings=2),
             ProcedureModel(name="SURGICAL EXTRACTION", price=3000, gap_days=7, total_sittings=2),
             ProcedureModel(name="SCALING", price=1000, gap_days=0, total_sittings=1),
-            ProcedureModel(name="METAL CROWN", price=1500, gap_days=3, total_sittings=2),
             ProcedureModel(name="PFM CROWN", price=2000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="PREMIUM PFM CROWN", price=2500, gap_days=3, total_sittings=2),
-            ProcedureModel(name="DMLS CROWN", price=3000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="ZIRCONIA CROWN 2", price=4000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="ZIRCONIA 5", price=5000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="ZIRCONIA 10", price=6000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="COMPLETE DENTURE", price=10000, gap_days=3, total_sittings=5),
-            ProcedureModel(name="RPD", price=500, gap_days=3, total_sittings=2),
-            ProcedureModel(name="VENEER", price=5000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="LOCAL IMPLANT", price=15000, gap_days=7, total_sittings=3),
-            ProcedureModel(name="KOREAN IMPLANT", price=25000, gap_days=7, total_sittings=3),
-            ProcedureModel(name="PREMIUM DENTURE", price=20000, gap_days=3, total_sittings=5),
-            ProcedureModel(name="ALIGNER", price=70000, gap_days=7, total_sittings=4)
+            ProcedureModel(name="ZIRCONIA CROWN", price=4000, gap_days=3, total_sittings=2)
         ]
         db.add_all(defaults)
         db.commit()
@@ -129,9 +115,7 @@ def get_analytics(db: Session = Depends(get_db)):
         "month_revenue": month_revenue,
         "total_dues": total_dues,
         "reel_leads": sum(1 for p in patients if p.source == "Instagram Reel"),
-        "web_leads": sum(1 for p in patients if p.source == "Website"),
-        "referral_leads": sum(1 for p in patients if p.source == "Patient Referral"),
-        "walkin_leads": sum(1 for p in patients if p.source == "Walk-in")
+        "web_leads": sum(1 for p in patients if p.source == "Website")
     }
 
 @app.get("/views/appointments")
@@ -139,33 +123,19 @@ def get_appointments(db: Session = Depends(get_db)):
     today = date.today()
     patients = db.query(PatientModel).all()
     today_list = []
-    future_list = []
-
+    
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
-        proc_name = proc.name if proc else "General"
-        wa_text = f"Hello {p.patient_name}, reminder for your dental appointment at SRA Dental Clinic today at {p.time_slot}."
-        wa_link = f"https://wa.me/91{p.phone_number}?text={wa_text.replace(' ', '%20')}" if p.phone_number else ""
-        
-        item = {
-            "opd_number": p.opd_number,
-            "patient_name": p.patient_name,
-            "phone": p.phone_number,
-            "patient_place": p.patient_place,
-            "procedure": proc_name,
-            "time_slot": p.time_slot,
-            "pending_payment": p.payment_left,
-            "whatsapp_link": wa_link,
-            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
-            "extracted_tooth": p.extracted_tooth
-        }
-
         if p.next_appointment == today:
-            today_list.append(item)
-        elif p.next_appointment and p.next_appointment > today:
-            future_list.append(item)
-
-    return {"today": today_list, "future": future_list, "scaling_recall": []}
+            today_list.append({
+                "opd_number": p.opd_number,
+                "patient_name": p.patient_name,
+                "phone": p.phone_number,
+                "procedure": proc.name if proc else "General",
+                "time_slot": p.time_slot,
+                "pending_payment": p.payment_left
+            })
+    return {"today": today_list}
 
 class PatientCreate(BaseModel):
     patient_name: str
@@ -190,39 +160,38 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     next_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
 
     new_patient = PatientModel(
-        opd_number=opd_number,
-        patient_name=data.patient_name,
-        phone_number=data.phone_number,
-        patient_place=data.patient_place,
-        procedure_id=data.procedure_id,
-        total_sittings=proc.total_sittings if proc else 1,
-        base_price=base_amt,
-        discount=data.discount,
-        total_amount=total_amt,
-        total_paid=data.payment_done,
-        payment_left=payment_left,
-        time_slot=data.time_slot,
-        next_appointment=next_date,
-        source=data.source,
-        extracted_tooth=data.extracted_tooth
+        opd_number=opd_number, patient_name=data.patient_name, phone_number=data.phone_number,
+        patient_place=data.patient_place, procedure_id=data.procedure_id,
+        total_sittings=proc.total_sittings if proc else 1, base_price=base_amt,
+        discount=data.discount, total_amount=total_amt, total_paid=data.payment_done,
+        payment_left=payment_left, time_slot=data.time_slot, next_appointment=next_date,
+        source=data.source, extracted_tooth=data.extracted_tooth
     )
     db.add(new_patient)
     db.commit()
     return {"message": "Success", "opd_number": opd_number}
 
-@app.post("/patients/{opd_number}/upload-xray")
-async def upload_xray(opd_number: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+# --- NEW ENDPOINT: FETCH PATIENT FOR DYNAMIC TREATMENT TAB ---
+@app.get("/patients/{opd_number}")
+def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
-    
-    file_path = f"uploads/{opd_number}_{file.filename}"
+    proc = db.query(ProcedureModel).filter(ProcedureModel.id == patient.procedure_id).first()
+    return {
+        "opd_number": patient.opd_number,
+        "patient_name": patient.patient_name,
+        "procedure_name": proc.name if proc else "General"
+    }
+
+# --- NEW ENDPOINT: UPLOAD BMP / X-RAY FILES DIRECTLY TO A TOOTH ---
+@app.post("/patients/{opd_number}/upload-treatment-file")
+async def upload_treatment_file(opd_number: str, file_type: str = Form(...), tooth_number: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):
+    # file_type expected: "BMP" or "XRAY"
+    file_path = f"uploads/{opd_number}_Tooth_{tooth_number}_{file_type}_{file.filename}"
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
-    
-    patient.xray_path = f"/{file_path}"
-    db.commit()
-    return {"message": "X-ray uploaded successfully", "xray_path": patient.xray_path}
+    return {"message": f"{file_type} File Uploaded successfully", "path": f"/{file_path}"}
 
 class EndoSaveRequest(BaseModel):
     opd_number: str
@@ -240,43 +209,19 @@ def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Endo chart saved successfully"}
 
-@app.get("/patients/{opd_number}/endo-chart")
-def get_endo_chart(opd_number: str, db: Session = Depends(get_db)):
-    charts = db.query(EndoChartModel).filter(EndoChartModel.opd_number == opd_number).all()
-    return [{"tooth_number": c.tooth_number, "canals_data": c.canals_data} for c in charts]
-
 @app.get("/views/daily-log")
 def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(PatientModel)
     if search:
-        query = query.filter(
-            (PatientModel.patient_name.contains(search)) |
-            (PatientModel.phone_number.contains(search)) |
-            (PatientModel.opd_number.contains(search)) |
-            (PatientModel.patient_place.contains(search)) |
-            (PatientModel.extracted_tooth.contains(search))
-        )
+        query = query.filter((PatientModel.patient_name.contains(search)) | (PatientModel.opd_number.contains(search)))
     patients = query.all()
     logs = []
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
         logs.append({
-            "opd_number": p.opd_number,
-            "date": p.created_date.isoformat(),
-            "patient_name": p.patient_name,
-            "phone_number": p.phone_number,
-            "patient_place": p.patient_place,
-            "procedure": proc.name if proc else "General",
-            "current_sitting": p.current_sitting,
-            "total_sittings": p.total_sittings,
-            "base_price": p.base_price,
-            "discount": p.discount,
-            "total_amount": p.total_amount,
-            "total_paid": p.total_paid,
-            "payment_left": p.payment_left,
-            "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
-            "source": p.source,
-            "xray_path": p.xray_path,
-            "extracted_tooth": p.extracted_tooth
+            "opd_number": p.opd_number, "date": p.created_date.isoformat(), "patient_name": p.patient_name,
+            "procedure": proc.name if proc else "General", "current_sitting": p.current_sitting,
+            "total_sittings": p.total_sittings, "total_amount": p.total_amount,
+            "total_paid": p.total_paid, "payment_left": p.payment_left
         })
     return logs
