@@ -36,6 +36,7 @@ class PatientModel(Base):
     total_paid = Column(Float, default=0.0)
     payment_left = Column(Float)
     time_slot = Column(String)
+    next_appointment = Column(Date, nullable=True)
     created_date = Column(Date, default=date.today)
 
 class EndoChartModel(Base):
@@ -48,9 +49,7 @@ class EndoChartModel(Base):
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SRA Dental Clinic API")
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 def get_db():
@@ -76,26 +75,60 @@ def get_procedures(db: Session = Depends(get_db)):
         procs = db.query(ProcedureModel).all()
     return [{"id": p.id, "name": p.name, "price": p.price} for p in procs]
 
+@app.get("/analytics")
+def get_analytics(db: Session = Depends(get_db)):
+    today = date.today()
+    patients = db.query(PatientModel).all()
+    today_revenue = sum(p.total_paid for p in patients if p.created_date == today)
+    total_revenue = sum(p.total_paid for p in patients)
+    today_opd = sum(1 for p in patients if p.created_date == today)
+    total_opd = len(patients)
+    return {
+        "daily_income": today_revenue,
+        "total_income": total_revenue,
+        "daily_opd": today_opd,
+        "total_opd": total_opd
+    }
+
+@app.get("/views/appointments")
+def get_appointments(db: Session = Depends(get_db)):
+    today = date.today()
+    patients = db.query(PatientModel).all()
+    today_list, future_list = [], []
+    for p in patients:
+        proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
+        item = {
+            "opd_number": p.opd_number, "patient_name": p.patient_name, "phone": p.phone_number,
+            "procedure": proc.name if proc else "General", "time_slot": p.time_slot,
+            "pending_payment": p.payment_left, "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None
+        }
+        if p.next_appointment == today:
+            today_list.append(item)
+        elif p.next_appointment and p.next_appointment > today:
+            future_list.append(item)
+    return {"today": today_list, "future": future_list}
+
 class PatientCreate(BaseModel):
     patient_name: str
     phone_number: str
     procedure_id: int
     time_slot: str
     payment_done: float
+    next_appointment: Optional[str] = None
 
 @app.post("/patients")
 def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     count = db.query(PatientModel).count() + 1
     opd_number = f"OPD-{100 + count}"
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == data.procedure_id).first()
-    
     base_amt = proc.price if proc else 0.0
     payment_left = max(0.0, base_amt - data.payment_done)
+    next_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
 
     new_patient = PatientModel(
         opd_number=opd_number, patient_name=data.patient_name, phone_number=data.phone_number,
         procedure_id=data.procedure_id, base_price=base_amt, total_amount=base_amt,
-        total_paid=data.payment_done, payment_left=payment_left, time_slot=data.time_slot
+        total_paid=data.payment_done, payment_left=payment_left, time_slot=data.time_slot, next_appointment=next_date
     )
     db.add(new_patient)
     db.commit()
@@ -104,14 +137,9 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
 @app.get("/patients/{opd_number}")
 def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
-    if not patient:
-        raise HTTPException(status_code=404, detail="Patient not found")
+    if not patient: raise HTTPException(status_code=404, detail="Patient not found")
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == patient.procedure_id).first()
-    return {
-        "opd_number": patient.opd_number,
-        "patient_name": patient.patient_name,
-        "procedure_name": proc.name if proc else "General"
-    }
+    return {"opd_number": patient.opd_number, "patient_name": patient.patient_name, "procedure_name": proc.name if proc else "General"}
 
 class EndoSaveRequest(BaseModel):
     opd_number: str
@@ -121,19 +149,15 @@ class EndoSaveRequest(BaseModel):
 @app.post("/patients/endo-chart")
 def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
     chart = db.query(EndoChartModel).filter(EndoChartModel.opd_number == data.opd_number, EndoChartModel.tooth_number == data.tooth_number).first()
-    if chart:
-        chart.canals_data = data.canals_data
-    else:
-        chart = EndoChartModel(opd_number=data.opd_number, tooth_number=data.tooth_number, canals_data=data.canals_data)
-        db.add(chart)
+    if chart: chart.canals_data = data.canals_data
+    else: db.add(EndoChartModel(opd_number=data.opd_number, tooth_number=data.tooth_number, canals_data=data.canals_data))
     db.commit()
     return {"message": "Saved successfully"}
 
 @app.post("/patients/{opd_number}/upload-treatment-file")
 async def upload_treatment_file(opd_number: str, file_type: str = Form(...), tooth_number: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):
     file_path = f"uploads/{opd_number}_Tooth_{tooth_number}_{file_type}_{file.filename}"
-    with open(file_path, "wb") as buffer:
-        buffer.write(await file.read())
+    with open(file_path, "wb") as buffer: buffer.write(await file.read())
     return {"message": f"Uploaded successfully"}
 
 @app.get("/views/daily-log")
@@ -143,8 +167,8 @@ def daily_log(db: Session = Depends(get_db)):
     for p in patients:
         proc = db.query(ProcedureModel).filter(ProcedureModel.id == p.procedure_id).first()
         logs.append({
-            "opd_number": p.opd_number, "patient_name": p.patient_name,
-            "procedure": proc.name if proc else "General",
-            "total_amount": p.total_amount, "total_paid": p.total_paid
+            "opd_number": p.opd_number, "patient_name": p.patient_name, "procedure": proc.name if proc else "General",
+            "total_amount": p.total_amount, "total_paid": p.total_paid, "payment_left": p.payment_left,
+            "date": p.created_date.isoformat()
         })
     return reversed(logs)
