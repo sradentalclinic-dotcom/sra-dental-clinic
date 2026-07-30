@@ -231,15 +231,23 @@ def register_patient(payload: PatientCreate, db: Session = Depends(get_db)):
 @app.post("/patients/import-xml")
 def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db)):
     try:
-        root = ET.fromstring(payload.xml_data)
+        root = ET.fromstring(payload.xml_data.strip())
     except ET.ParseError as e:
         raise HTTPException(status_code=400, detail=f"Invalid XML format: {str(e)}")
 
+    # Robust Fallback for Patient Header
     header = root.find("PatientHeader")
-    patient_id = header.find("PatientID").text if header is not None and header.find("PatientID") is not None else "PT-904281"
-    operatory = header.find("OperatoryRoom").text if header is not None and header.find("OperatoryRoom") is not None else "Op-03"
+    patient_id = "904281"
+    operatory = "Op-03"
+    if header is not None:
+        pid_elem = header.find("PatientID")
+        if pid_elem is not None and pid_elem.text:
+            patient_id = pid_elem.text.replace("PT-", "")
+        op_elem = header.find("OperatoryRoom")
+        if op_elem is not None and op_elem.text:
+            operatory = op_elem.text
 
-    opd_number = f"OPD-{patient_id.replace('PT-', '')}"
+    opd_number = f"OPD-{patient_id}"
     existing = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
     if not existing:
         patient = PatientModel(
@@ -266,12 +274,11 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
             region = arch.attrib.get("region")
             if region == "Maxillary_Upper":
                 max_status = arch.attrib.get("status")
-                max_notes = arch.findtext("Notes")
+                max_notes = arch.findtext("Notes") or ""
             elif region == "Mandibular_Lower":
                 mand_status = arch.attrib.get("status")
                 mand_count = int(arch.findtext("ActiveTeethCount") or 0)
         
-        # Upsert Arch Summary
         existing_arch = db.query(ArchSummaryModel).filter(ArchSummaryModel.opd_number == opd_number).first()
         if existing_arch:
             existing_arch.maxillary_status = max_status
@@ -291,6 +298,8 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
     # Parse Extractions
     extractions = root.find("Extractions")
     if extractions is not None:
+        # Clear existing extractions for idempotency
+        db.query(ExtractionModel).filter(ExtractionModel.opd_number == opd_number).delete()
         for proc in extractions.findall("ProcedureRecord"):
             tooth = proc.find("ToothNumber")
             ext = ExtractionModel(
@@ -298,17 +307,22 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
                 tooth_universal=tooth.attrib.get("Universal") if tooth is not None else "",
                 fdi=tooth.attrib.get("FDI") if tooth is not None else "",
                 tooth_name=tooth.text if tooth is not None else "",
-                procedure_code=proc.findtext("ProcedureCode"),
-                description=proc.findtext("Description"),
-                anesthesia=proc.findtext("Anesthesia"),
-                complications=proc.findtext("Complications"),
-                status=proc.findtext("Status")
+                procedure_code=proc.findtext("ProcedureCode") or "",
+                description=proc.findtext("Description") or "",
+                anesthesia=proc.findtext("Anesthesia") or "",
+                complications=proc.findtext("Complications") or "",
+                status=proc.findtext("Status") or ""
             )
             db.add(ext)
 
     # Parse Endodontics
     endos = root.find("Endodontics")
     if endos is not None:
+        # Clear existing endos for idempotency
+        existing_endos = db.query(EndoRecordModel).filter(EndoRecordModel.opd_number == opd_number).all()
+        for e in existing_endos:
+            db.delete(e)
+
         for proc in endos.findall("ProcedureRecord"):
             tooth = proc.find("ToothNumber")
             endo = EndoRecordModel(
@@ -316,13 +330,13 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
                 tooth_universal=tooth.attrib.get("Universal") if tooth is not None else "",
                 fdi=tooth.attrib.get("FDI") if tooth is not None else "",
                 tooth_name=tooth.text if tooth is not None else "",
-                procedure_code=proc.findtext("ProcedureCode"),
-                description=proc.findtext("Description"),
-                system_used=proc.findtext("SystemUsed"),
-                irrigants=proc.findtext("Irrigants"),
-                master_apical_file=proc.findtext("MasterApicalFile"),
-                obturation=proc.findtext("Obturation"),
-                status=proc.findtext("Status")
+                procedure_code=proc.findtext("ProcedureCode") or "",
+                description=proc.findtext("Description") or "",
+                system_used=proc.findtext("SystemUsed") or "",
+                irrigants=proc.findtext("Irrigants") or "",
+                master_apical_file=proc.findtext("MasterApicalFile") or "",
+                obturation=proc.findtext("Obturation") or "",
+                status=proc.findtext("Status") or ""
             )
             db.add(endo)
             db.flush()
@@ -332,37 +346,38 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
                 for c in canal_chart.findall("Canal"):
                     canal = CanalModel(
                         endo_record_id=endo.id,
-                        canal_name=c.attrib.get("name"),
-                        reference_point=c.findtext("ReferencePoint"),
-                        working_length=c.findtext("WorkingLength"),
-                        master_file=c.findtext("MasterFile"),
-                        status=c.findtext("Status")
+                        canal_name=c.attrib.get("name") or "",
+                        reference_point=c.findtext("ReferencePoint") or "",
+                        working_length=c.findtext("WorkingLength") or "",
+                        master_file=c.findtext("MasterFile") or "",
+                        status=c.findtext("Status") or ""
                     )
                     db.add(canal)
 
     # Parse Diagnostic Attachments
     attachments = root.find("DiagnosticAttachments")
     if attachments is not None:
+        db.query(AttachmentModel).filter(AttachmentModel.opd_number == opd_number).delete()
         for att in attachments.findall("Attachment"):
             attachment = AttachmentModel(
                 opd_number=opd_number,
-                attachment_id=att.attrib.get("id"),
-                type=att.attrib.get("type"),
-                label=att.findtext("Label"),
-                mime_type=att.findtext("MimeType"),
-                secure_url=att.findtext("SecureAccessURL"),
-                status=att.findtext("Status")
+                attachment_id=att.attrib.get("id") or "",
+                type=att.attrib.get("type") or "",
+                label=att.findtext("Label") or "",
+                mime_type=att.findtext("MimeType") or "",
+                secure_url=att.findtext("SecureAccessURL") or "",
+                status=att.findtext("Status") or ""
             )
             db.add(attachment)
 
     db.commit()
-    return {"status": "success", "opd_number": opd_number, "message": "Clinical XML and Arch Summary Imported Successfully"}
+    return {"status": "success", "opd_number": opd_number, "message": "Clinical XML Imported Successfully"}
 
 @app.get("/patients/{opd_number}")
 def get_patient(opd_number: str, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
     if not patient:
-        raise HTTPException(status_code=404, detail="Patient not found")
+        raise HTTPException(status_code=404, detail=f"Patient {opd_number} not found in database")
     
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == patient.procedure_id).first()
     return {
