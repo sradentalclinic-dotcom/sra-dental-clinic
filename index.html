@@ -80,10 +80,10 @@
       <div class="card">
         <h3>Patient Consultation & Operatory Registration</h3>
         <div class="form-grid">
-          <div><label>Patient Full Name</label><input type="text" id="regName" placeholder="e.g. Rahul Sharma"></div>
-          <div><label>Phone Number</label><input type="text" id="regPhone" placeholder="e.g. 9876543210"></div>
+          <div><label>Patient Full Name *</label><input type="text" id="regName" placeholder="e.g. Rahul Sharma"></div>
+          <div><label>Phone Number *</label><input type="text" id="regPhone" placeholder="e.g. 9876543210"></div>
           <div><label>Patient Place / City Address</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
-          <div><label>Select Procedure</label><select id="regProc" onchange="updateProcPrice()"></select></div>
+          <div><label>Select Procedure *</label><select id="regProc" onchange="updateProcPrice()"></select></div>
           <div><label>Registration Time Slot</label><input type="time" id="regTime" value="10:00"></div>
           <div><label>Operatory Chair Assignment</label>
             <select id="regChair">
@@ -218,7 +218,6 @@
       if(tabId === 'logs') loadDailyLogs();
     }
 
-    // --- WHATSAPP UTILITY FUNCTIONS ---
     function cleanPhoneNumber(phone) {
       if(!phone) return '';
       let cleaned = phone.replace(/\D/g, '');
@@ -272,12 +271,21 @@
     }
 
     async function registerPatient() {
+      const name = document.getElementById('regName').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const procId = document.getElementById('regProc').value;
+
+      if (!name || !phone || !procId) {
+        alert("Please fill in: Patient Name, Phone Number, and Procedure!");
+        return;
+      }
+
       const payload = {
-        patient_name: document.getElementById('regName').value,
-        phone_number: document.getElementById('regPhone').value,
+        patient_name: name,
+        phone_number: phone,
         patient_place: document.getElementById('regPlace').value || "Mandi Dabwali",
-        procedure_id: parseInt(document.getElementById('regProc').value) || 1,
-        time_slot: document.getElementById('regTime').value,
+        procedure_id: parseInt(procId),
+        time_slot: document.getElementById('regTime').value || "10:00",
         payment_done: parseFloat(document.getElementById('regPaid').value) || 0,
         discount: parseFloat(document.getElementById('regDiscount').value) || 0,
         next_appointment: document.getElementById('regNextDate').value || null,
@@ -288,16 +296,29 @@
       };
 
       try {
-        const res = await fetch('/patients', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        const res = await fetch('/patients', { 
+          method: 'POST', 
+          headers: {'Content-Type': 'application/json'}, 
+          body: JSON.stringify(payload) 
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          alert(`Error Saving Patient: ${JSON.stringify(errData.detail || errData)}`);
+          return;
+        }
+
         const data = await res.json();
-        document.getElementById('regStatus').innerText = `✅ Patient Registered! OPD: ${data.opd_number}`;
+        document.getElementById('regStatus').innerText = `✅ Patient Saved Permanently! OPD: ${data.opd_number}`;
         
         setTimeout(() => {
           document.getElementById('treatOpd').value = data.opd_number;
           switchTab('treatment');
           loadTreatmentDetails();
         }, 1200);
-      } catch (e) { alert("Failed to register patient."); }
+      } catch (e) { 
+        alert("Failed to reach backend server: " + e.message); 
+      }
     }
 
     function populateTeethDropdown() {
