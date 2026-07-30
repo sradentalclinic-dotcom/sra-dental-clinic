@@ -75,7 +75,7 @@
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Age</label><input type="number" id="regAge" placeholder="e.g. 32" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Phone Number *</label><input type="text" id="regPhone" placeholder="9876543210" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Place / Location</label><input type="text" id="regPlace" value="Mandi Dabwali" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
-          <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Procedure (23 Included) *</label><select id="regProc" onchange="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></select></div>
+          <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Procedure *</label><select id="regProc" onchange="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></select></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Units / Teeth Count *</label><input type="number" id="regUnits" value="1" min="1" oninput="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Unit Rate (₹)</label><input type="number" id="regBasePrice" readonly class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Discount (₹)</label><input type="number" id="regDiscount" value="0" oninput="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
@@ -115,11 +115,73 @@
         </div>
 
         <div id="dynamicTreatmentArea" class="hidden">
-          <div class="p-4 rounded-xl bg-slate-100 text-slate-800 font-bold text-sm mb-6" id="treatPatientInfo"></div>
+          <div class="p-4 rounded-xl bg-slate-100 text-slate-800 font-bold text-sm mb-6 flex justify-between items-center" id="treatPatientInfo"></div>
+
+          <!-- NEW: Clinical Records Charting Section -->
+          <div class="p-6 rounded-2xl bg-white border border-teal-200 shadow-sm mb-6">
+            <h3 class="font-bold text-teal-900 mb-4 text-sm uppercase tracking-wider border-b border-teal-100 pb-2">New Clinical Entry (RCT / Extraction)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Tooth Number</label>
+                <input type="text" id="clinTooth" placeholder="e.g. 16, 36" class="w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Procedure</label>
+                <select id="clinProc" onchange="updateClinicalStages()" class="w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500">
+                  <option value="RCT">Endodontics (RCT)</option>
+                  <option value="EXTRACTION">Extraction</option>
+                  <option value="CONSULTATION">Consultation / Gen</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Stage</label>
+                <select id="clinStage" class="w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500">
+                  <option value="Access Opened">Access Opened</option>
+                  <option value="BMP Done">BMP Done</option>
+                  <option value="Master Cone">Master Cone</option>
+                  <option value="Obturation">Obturation</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Detailed Notes / Canal Working Lengths</label>
+              <textarea id="clinDetails" rows="2" class="w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-teal-500" placeholder='Enter clinical notes or JSON (e.g. {"MB":"20mm", "DB":"19mm"})'></textarea>
+            </div>
+            <button onclick="saveClinicalRecord()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition-all shadow">Save Record to Patient Chart</button>
+          </div>
+
+          <!-- Past Clinical Records Table -->
+          <div class="mb-6">
+            <h3 class="font-bold text-slate-900 mb-2 text-sm">Past Clinical Notes</h3>
+            <div class="overflow-x-auto border rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
+                  <tr><th class="p-3">Date</th><th class="p-3">Tooth</th><th class="p-3">Procedure</th><th class="p-3">Stage</th><th class="p-3">Details</th></tr>
+                </thead>
+                <tbody id="clinicalRecordsTable" class="divide-y divide-slate-100 bg-white"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- NEW: X-Ray / File Upload Section -->
+          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 mb-6">
+            <h3 class="font-bold text-slate-900 mb-4 text-sm uppercase tracking-wider">File & X-Ray Upload</h3>
+            <div class="flex gap-4 items-end flex-wrap">
+              <div class="flex-1"><label class="block text-xs font-bold text-slate-500 mb-1">File Type</label>
+                <select id="uploadType" class="w-full p-2.5 rounded-lg border text-sm">
+                  <option value="XRAY">X-Ray (IOPA)</option>
+                  <option value="PHOTO">Clinical Photo</option>
+                </select>
+              </div>
+              <div class="flex-1"><label class="block text-xs font-bold text-slate-500 mb-1">Tooth</label><input type="text" id="uploadTooth" class="w-full p-2.5 rounded-lg border text-sm" placeholder="e.g. 11"></div>
+              <div class="flex-[2]"><label class="block text-xs font-bold text-slate-500 mb-1">File</label><input type="file" id="uploadFile" class="w-full p-1.5 rounded-lg border text-sm bg-white"></div>
+              <button onclick="uploadTreatmentFile()" class="bg-slate-900 hover:bg-teal-600 text-white font-bold px-6 py-2.5 rounded-lg text-xs transition-all">Upload File</button>
+            </div>
+          </div>
 
           <!-- Edit Section -->
           <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 mb-6">
-            <h3 class="font-bold text-slate-900 mb-4 text-sm uppercase tracking-wider">Update Patient Record & Billing</h3>
+            <h3 class="font-bold text-slate-900 mb-4 text-sm uppercase tracking-wider">Update Patient Financials & Info</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Name</label><input type="text" id="editName" class="w-full p-2.5 rounded-lg border text-sm"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Age</label><input type="number" id="editAge" class="w-full p-2.5 rounded-lg border text-sm"></div>
@@ -239,22 +301,26 @@
     }
 
     async function loadDashboard() {
-      const res = await fetch('/analytics');
-      const data = await res.json();
-      document.getElementById('statTodayRev').innerText = `₹${data.today_revenue}`;
-      document.getElementById('statMonthRev').innerText = `₹${data.month_revenue}`;
-      document.getElementById('statTotalDues').innerText = `₹${data.total_dues}`;
-      document.getElementById('statLabDues').innerText = `₹${data.total_lab_dues || 0}`;
-      document.getElementById('statDailyOpd').innerText = data.today_opd;
-      document.getElementById('statTotalOpd').innerText = data.total_opd;
+      try {
+        const res = await fetch('/analytics');
+        const data = await res.json();
+        document.getElementById('statTodayRev').innerText = `₹${data.today_revenue}`;
+        document.getElementById('statMonthRev').innerText = `₹${data.month_revenue}`;
+        document.getElementById('statTotalDues').innerText = `₹${data.total_dues}`;
+        document.getElementById('statLabDues').innerText = `₹${data.total_lab_dues || 0}`;
+        document.getElementById('statDailyOpd').innerText = data.today_opd;
+        document.getElementById('statTotalOpd').innerText = data.total_opd;
+      } catch (e) { console.error("Error loading dashboard", e); }
     }
 
     async function loadProcedures() {
-      const res = await fetch('/procedures');
-      proceduresCache = await res.json();
-      const select = document.getElementById('regProc');
-      select.innerHTML = '<option value="">-- Choose Procedure --</option>';
-      proceduresCache.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price})</option>`);
+      try {
+        const res = await fetch('/procedures');
+        proceduresCache = await res.json();
+        const select = document.getElementById('regProc');
+        select.innerHTML = '<option value="">-- Choose Procedure --</option>';
+        proceduresCache.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price})</option>`);
+      } catch (e) { console.error("Error loading procedures", e); }
     }
 
     function updateRegisterCalculations() {
@@ -283,6 +349,24 @@
       document.getElementById('labCostDisplay').innerText = `₹${(LAB_RATES[item] || 0) * units}`;
     }
 
+    // --- NEW: Handle Clinical Stages Dropdown Logic ---
+    function updateClinicalStages() {
+      const proc = document.getElementById('clinProc').value;
+      const stageSelect = document.getElementById('clinStage');
+      stageSelect.innerHTML = '';
+      let stages = [];
+      
+      if (proc === 'RCT') {
+        stages = ['Access Opened', 'BMP Done', 'Master Cone', 'Obturation'];
+      } else if (proc === 'EXTRACTION') {
+        stages = ['LA Given', 'Tooth Extracted', 'Sutures Placed'];
+      } else {
+        stages = ['Consultation Done', 'Treatment Complete'];
+      }
+      
+      stages.forEach(s => stageSelect.innerHTML += `<option value="${s}">${s}</option>`);
+    }
+
     async function registerPatient() {
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
@@ -303,31 +387,102 @@
         operatory_chair: document.getElementById('regChair').value
       };
 
-      const res = await fetch('/patients', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-      const data = await res.json();
-      document.getElementById('regStatus').innerText = `Registered! OPD: ${data.opd_number}`;
-      setTimeout(() => { document.getElementById('treatOpd').value = data.opd_number; switchTab('treatment'); loadTreatmentDetails(); }, 1000);
+      try {
+        const res = await fetch('/patients', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        const data = await res.json();
+        document.getElementById('regStatus').innerText = `Registered! OPD: ${data.opd_number}`;
+        setTimeout(() => { document.getElementById('treatOpd').value = data.opd_number; switchTab('treatment'); loadTreatmentDetails(); }, 1000);
+      } catch (e) { alert("Registration failed!"); }
     }
 
     async function loadTreatmentDetails() {
       const opd = document.getElementById('treatOpd').value;
       if(!opd) return;
-      const res = await fetch(`/patients/${opd}`);
-      if(!res.ok) { alert("Patient not found!"); return; }
-      const patient = await res.json();
-      
-      document.getElementById('dynamicTreatmentArea').classList.remove('hidden');
-      document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} | OPD: ${patient.opd_number} | Procedure: ${patient.procedure_name} (${patient.units} Units)`;
+      try {
+        const res = await fetch(`/patients/${opd}`);
+        if(!res.ok) { alert("Patient not found!"); return; }
+        const patient = await res.json();
+        
+        document.getElementById('dynamicTreatmentArea').classList.remove('hidden');
+        
+        // Show basic info and X-ray path if exists
+        let xrayHtml = patient.xray_path ? `<a href="${patient.xray_path}" target="_blank" class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs hover:bg-teal-200">View X-Ray</a>` : '';
+        document.getElementById('treatPatientInfo').innerHTML = `<div>Patient: <b>${patient.patient_name}</b> | OPD: <b>${patient.opd_number}</b> | Procedure: <b>${patient.procedure_name} (${patient.units} Units)</b></div> ${xrayHtml}`;
 
-      document.getElementById('editName').value = patient.patient_name;
-      document.getElementById('editName').setAttribute('data-baseprice', patient.base_price);
-      document.getElementById('editAge').value = patient.age || '';
-      document.getElementById('editPhone').value = patient.phone_number;
-      document.getElementById('editPlace').value = patient.patient_place;
-      document.getElementById('editUnits').value = patient.units;
-      document.getElementById('editPaid').value = patient.total_paid;
-      document.getElementById('editDiscount').value = patient.discount;
-      updateEditCalculations();
+        // Populate Edit Financials
+        document.getElementById('editName').value = patient.patient_name;
+        document.getElementById('editName').setAttribute('data-baseprice', patient.base_price);
+        document.getElementById('editAge').value = patient.age || '';
+        document.getElementById('editPhone').value = patient.phone_number;
+        document.getElementById('editPlace').value = patient.patient_place;
+        document.getElementById('editUnits').value = patient.units;
+        document.getElementById('editPaid').value = patient.total_paid;
+        document.getElementById('editDiscount').value = patient.discount;
+        updateEditCalculations();
+
+        // Populate Clinical Records Table
+        const tbody = document.getElementById('clinicalRecordsTable');
+        tbody.innerHTML = '';
+        if (patient.clinical_records && patient.clinical_records.length > 0) {
+          patient.clinical_records.forEach(cr => {
+            const detailsStr = typeof cr.details === 'object' ? JSON.stringify(cr.details) : (cr.details || '-');
+            tbody.innerHTML += `<tr>
+              <td class="p-3">${cr.updated_at || '-'}</td>
+              <td class="p-3 font-bold">${cr.tooth_number}</td>
+              <td class="p-3">${cr.procedure_type}</td>
+              <td class="p-3">${cr.stage}</td>
+              <td class="p-3 text-slate-500">${detailsStr}</td>
+            </tr>`;
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">No clinical notes recorded yet.</td></tr>';
+        }
+      } catch (e) { console.error("Error loading patient", e); }
+    }
+
+    // --- NEW: Save Clinical Record Function ---
+    async function saveClinicalRecord() {
+      const opd = document.getElementById('treatOpd').value;
+      const payload = {
+        opd_number: opd,
+        tooth_number: document.getElementById('clinTooth').value,
+        procedure_type: document.getElementById('clinProc').value,
+        stage: document.getElementById('clinStage').value,
+        details: document.getElementById('clinDetails').value
+      };
+
+      if (!payload.tooth_number) { alert("Tooth number is required!"); return; }
+
+      try {
+        await fetch('/patients/clinical-records', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('clinDetails').value = ''; // clear text area
+        loadTreatmentDetails(); // refresh table
+      } catch (e) { alert("Failed to save clinical record."); }
+    }
+
+    // --- NEW: Upload Treatment File Function ---
+    async function uploadTreatmentFile() {
+      const opd = document.getElementById('treatOpd').value;
+      const fileInput = document.getElementById('uploadFile');
+      if (!fileInput.files.length) { alert("Please select a file first."); return; }
+
+      const formData = new FormData();
+      formData.append('file_type', document.getElementById('uploadType').value);
+      formData.append('tooth_number', document.getElementById('uploadTooth').value || "N/A");
+      formData.append('file', fileInput.files[0]);
+
+      try {
+        await fetch(`/patients/${opd}/upload-treatment-file`, {
+          method: 'POST',
+          body: formData
+        });
+        alert("File uploaded successfully!");
+        loadTreatmentDetails();
+      } catch (e) { alert("File upload failed."); }
     }
 
     async function updatePatientDetails() {
