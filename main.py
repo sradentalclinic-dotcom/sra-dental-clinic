@@ -183,6 +183,56 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     db.refresh(new_patient)
     return {"message": "Patient registered successfully", "opd_number": opd_number}
 
+class PatientUpdate(BaseModel):
+    patient_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    patient_place: Optional[str] = None
+    procedure_id: Optional[int] = None
+    time_slot: Optional[str] = None
+    payment_done: Optional[float] = None
+    discount: Optional[float] = None
+    next_appointment: Optional[str] = None
+    next_appointment_time: Optional[str] = None
+    operatory_chair: Optional[str] = None
+
+@app.put("/patients/{opd_number}")
+def update_patient(opd_number: str, data: PatientUpdate, db: Session = Depends(get_db)):
+    patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient record not found")
+    
+    if data.patient_name is not None: patient.patient_name = data.patient_name
+    if data.phone_number is not None: patient.phone_number = data.phone_number
+    if data.patient_place is not None: patient.patient_place = data.patient_place
+    if data.operatory_chair is not None: patient.operatory_chair = data.operatory_chair
+    if data.time_slot is not None: patient.time_slot = data.time_slot
+    if data.next_appointment_time is not None: patient.next_appointment_time = data.next_appointment_time
+    
+    if data.procedure_id is not None and data.procedure_id > 0:
+        patient.procedure_id = data.procedure_id
+        proc = db.query(ProcedureModel).filter(ProcedureModel.id == data.procedure_id).first()
+        if proc:
+            patient.base_price = proc.price
+            patient.total_sittings = proc.total_sittings
+
+    if data.discount is not None: patient.discount = data.discount
+    if data.payment_done is not None: patient.total_paid = data.payment_done
+    
+    patient.total_amount = max(0.0, patient.base_price - patient.discount)
+    patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
+
+    if data.next_appointment is not None:
+        if data.next_appointment.strip():
+            try:
+                patient.next_appointment = datetime.strptime(data.next_appointment.strip(), "%Y-%m-%d").date()
+            except ValueError:
+                patient.next_appointment = None
+        else:
+            patient.next_appointment = None
+
+    db.commit()
+    return {"message": "Patient updated successfully"}
+
 @app.get("/patients/{opd_number}")
 def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
@@ -202,9 +252,12 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
         "total_amount": patient.total_amount,
         "total_paid": patient.total_paid,
         "payment_left": patient.payment_left,
+        "discount": patient.discount,
         "source": patient.source,
         "operatory_chair": patient.operatory_chair,
         "medical_alerts": patient.medical_alerts,
+        "next_appointment": patient.next_appointment.isoformat() if patient.next_appointment else None,
+        "next_appointment_time": patient.next_appointment_time,
         "charts": saved_charts
     }
 
