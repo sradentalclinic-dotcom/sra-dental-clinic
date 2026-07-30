@@ -27,6 +27,7 @@ class PatientModel(Base):
     opd_number = Column(String, primary_key=True, index=True)
     patient_name = Column(String)
     phone_number = Column(String)
+    patient_place = Column(String, default="")
     procedure_id = Column(Integer)
     total_sittings = Column(Integer, default=1)
     current_sitting = Column(Integer, default=1)
@@ -38,7 +39,7 @@ class PatientModel(Base):
     time_slot = Column(String)
     next_appointment = Column(Date, nullable=True)
     created_date = Column(Date, default=date.today)
-    source = Column(String, default="Website")
+    source = Column(String, default="Walkin")
 
 Base.metadata.create_all(bind=engine)
 
@@ -126,15 +127,19 @@ def get_analytics(db: Session = Depends(get_db)):
     month_revenue = sum(p.total_paid for p in patients if p.created_date.month == today.month and p.created_date.year == today.year)
     total_dues = sum(p.payment_left for p in patients)
     
-    reel_leads = sum(1 for p in patients if p.source == "Instagram Reel")
-    web_leads = sum(1 for p in patients if p.source == "Website")
+    referral_leads = sum(1 for p in patients if p.source == "Referral")
+    insta_leads = sum(1 for p in patients if p.source == "Insta")
+    google_leads = sum(1 for p in patients if p.source == "Google")
+    walkin_leads = sum(1 for p in patients if p.source == "Walkin")
     
     return {
         "today_revenue": today_revenue,
         "month_revenue": month_revenue,
         "total_dues": total_dues,
-        "reel_leads": reel_leads,
-        "web_leads": web_leads
+        "referral_leads": referral_leads,
+        "insta_leads": insta_leads,
+        "google_leads": google_leads,
+        "walkin_leads": walkin_leads
     }
 
 @app.get("/views/appointments")
@@ -159,6 +164,7 @@ def get_appointments(db: Session = Depends(get_db)):
             "opd_number": p.opd_number,
             "patient_name": p.patient_name,
             "phone": p.phone_number,
+            "patient_place": p.patient_place,
             "procedure": proc_name,
             "time_slot": p.time_slot,
             "pending_payment": p.payment_left,
@@ -179,6 +185,7 @@ def get_appointments(db: Session = Depends(get_db)):
                 "opd_number": p.opd_number,
                 "patient_name": p.patient_name,
                 "phone": p.phone_number,
+                "patient_place": p.patient_place,
                 "last_date": p.created_date.isoformat(),
                 "whatsapp_link": scale_link
             })
@@ -188,12 +195,13 @@ def get_appointments(db: Session = Depends(get_db)):
 class PatientCreate(BaseModel):
     patient_name: str
     phone_number: str
+    patient_place: str = ""
     procedure_id: int
     time_slot: str
     payment_done: float
     discount: float = 0.0
     next_appointment: Optional[str] = None
-    source: str = "Website"
+    source: str = "Walkin"
 
 @app.post("/patients")
 def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
@@ -212,6 +220,7 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
         opd_number=opd_number,
         patient_name=data.patient_name,
         phone_number=data.phone_number,
+        patient_place=data.patient_place,
         procedure_id=data.procedure_id,
         total_sittings=proc.total_sittings if proc else 1,
         base_price=base_amt,
@@ -260,6 +269,7 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
         query = query.filter(
             (PatientModel.patient_name.contains(search)) |
             (PatientModel.phone_number.contains(search)) |
+            (PatientModel.patient_place.contains(search)) |
             (PatientModel.opd_number.contains(search))
         )
     patients = query.all()
@@ -270,6 +280,7 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "opd_number": p.opd_number,
             "date": p.created_date.isoformat(),
             "patient_name": p.patient_name,
+            "patient_place": p.patient_place,
             "procedure": proc.name if proc else "General",
             "current_sitting": p.current_sitting,
             "total_sittings": p.total_sittings,
