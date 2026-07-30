@@ -73,6 +73,17 @@ class LabWorkModel(Base):
     payment_status = Column(String, default="Pending")
     created_date = Column(Date, default=date.today)
 
+# NEW: Comprehensive Clinical Records for RCT / Extractions / Consultations
+class ClinicalRecordModel(Base):
+    __tablename__ = "clinical_records"
+    id = Column(Integer, primary_key=True, index=True)
+    opd_number = Column(String, index=True)
+    tooth_number = Column(String)
+    procedure_type = Column(String) # e.g., "RCT", "EXTRACTION"
+    stage = Column(String) # e.g., "Access Opened", "LA Given", etc.
+    details = Column(Text) # JSON string for specific fields (Canals, Working Length, Rotary, etc.)
+    updated_at = Column(Date, default=date.today)
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SRA Dental Modern Operatory Suite")
@@ -289,6 +300,7 @@ def delete_patient(opd_number: str, db: Session = Depends(get_db)):
     
     db.query(EndoChartModel).filter(EndoChartModel.opd_number == opd_number).delete()
     db.query(LabWorkModel).filter(LabWorkModel.opd_number == opd_number).delete()
+    db.query(ClinicalRecordModel).filter(ClinicalRecordModel.opd_number == opd_number).delete()
     db.delete(patient)
     db.commit()
     return {"message": f"Patient {opd_number} permanently deleted"}
@@ -302,6 +314,19 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     
     charts = db.query(EndoChartModel).filter(EndoChartModel.opd_number == opd_number).all()
     saved_charts = {c.tooth_number: json.loads(c.canals_data) for c in charts}
+
+    # Fetch Clinical Records
+    clinical_db = db.query(ClinicalRecordModel).filter(ClinicalRecordModel.opd_number == opd_number).all()
+    clinical_records = []
+    for cr in clinical_db:
+        clinical_records.append({
+            "id": cr.id,
+            "tooth_number": cr.tooth_number,
+            "procedure_type": cr.procedure_type,
+            "stage": cr.stage,
+            "details": json.loads(cr.details) if cr.details else {},
+            "updated_at": cr.updated_at.isoformat() if cr.updated_at else None
+        })
 
     return {
         "opd_number": patient.opd_number,
@@ -322,7 +347,8 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
         "medical_alerts": patient.medical_alerts,
         "next_appointment": patient.next_appointment.isoformat() if patient.next_appointment else None,
         "next_appointment_time": patient.next_appointment_time,
-        "charts": saved_charts
+        "charts": saved_charts,
+        "clinical_records": clinical_records
     }
 
 # LAB WORK RATES & BILLING
@@ -444,6 +470,40 @@ def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
         db.add(chart)
     db.commit()
     return {"message": "Endo chart saved successfully"}
+
+# NEW: Save Detailed Clinical Records (RCT / Extractions)
+class ClinicalRecordCreate(BaseModel):
+    opd_number: str
+    tooth_number: str
+    procedure_type: str
+    stage: str
+    details: str # JSON String
+
+@app.post("/patients/clinical-records")
+def save_clinical_record(data: ClinicalRecordCreate, db: Session = Depends(get_db)):
+    record = db.query(ClinicalRecordModel).filter(
+        ClinicalRecordModel.opd_number == data.opd_number, 
+        ClinicalRecordModel.tooth_number == data.tooth_number,
+        ClinicalRecordModel.procedure_type == data.procedure_type
+    ).first()
+    
+    if record:
+        record.stage = data.stage
+        record.details = data.details
+        record.updated_at = date.today()
+    else:
+        record = ClinicalRecordModel(
+            opd_number=data.opd_number,
+            tooth_number=data.tooth_number,
+            procedure_type=data.procedure_type,
+            stage=data.stage,
+            details=data.details,
+            updated_at=date.today()
+        )
+        db.add(record)
+    
+    db.commit()
+    return {"message": f"{data.procedure_type} record saved successfully"}
 
 @app.get("/views/appointments")
 def get_appointments(db: Session = Depends(get_db)):
