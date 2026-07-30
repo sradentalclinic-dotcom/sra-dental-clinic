@@ -248,14 +248,32 @@
 
     <!-- TAB 5: APPOINTMENTS -->
     <div id="appointments" class="tab-content">
+      <!-- Today's Appointments -->
       <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm mb-8">
-        <h3 class="font-bold text-slate-900 mb-4">Today's Appointments</h3>
+        <h3 class="font-bold text-slate-900 mb-4 text-base flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> Today's Appointments
+        </h3>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
               <tr><th class="p-3">OPD</th><th class="p-3">Name</th><th class="p-3">Phone</th><th class="p-3">Procedure</th><th class="p-3">Units</th><th class="p-3">Chair</th><th class="p-3">Time</th><th class="p-3">Due</th><th class="p-3">Action</th></tr>
             </thead>
             <tbody id="todayApptTable" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Future / Upcoming Appointments -->
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-900 mb-4 text-base flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Future / Upcoming Appointments
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-600 uppercase font-bold">
+              <tr><th class="p-3">Date</th><th class="p-3">OPD</th><th class="p-3">Name</th><th class="p-3">Phone</th><th class="p-3">Procedure</th><th class="p-3">Units</th><th class="p-3">Chair</th><th class="p-3">Time</th><th class="p-3">Due</th><th class="p-3">Action</th></tr>
+            </thead>
+            <tbody id="futureApptTable" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
@@ -536,11 +554,28 @@
     async function loadAppointments() {
       const res = await fetch('/views/appointments');
       const data = await res.json();
-      let html = '';
-      data.today.forEach(i => {
-        html += `<tr><td class="p-3 font-bold">${i.opd_number}</td><td class="p-3">${i.patient_name}</td><td class="p-3">${i.phone}</td><td class="p-3">${i.procedure}</td><td class="p-3">${i.units}</td><td class="p-3">${i.operatory_chair}</td><td class="p-3">${i.time_slot}</td><td class="p-3 text-rose-600 font-bold">₹${i.pending_payment}</td><td class="p-3"><a href="https://api.whatsapp.com/send?phone=91${i.phone}" target="_blank" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">WhatsApp</a></td></tr>`;
-      });
-      document.getElementById('todayApptTable').innerHTML = html;
+      
+      // Render Today's Appointments
+      let todayHtml = '';
+      if (data.today && data.today.length > 0) {
+        data.today.forEach(i => {
+          todayHtml += `<tr><td class="p-3 font-bold">${i.opd_number}</td><td class="p-3">${i.patient_name}</td><td class="p-3">${i.phone}</td><td class="p-3">${i.procedure}</td><td class="p-3">${i.units}</td><td class="p-3">${i.operatory_chair}</td><td class="p-3">${i.time_slot}</td><td class="p-3 text-rose-600 font-bold">₹${i.pending_payment}</td><td class="p-3"><a href="https://api.whatsapp.com/send?phone=91${i.phone}" target="_blank" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">WhatsApp</a></td></tr>`;
+        });
+      } else {
+        todayHtml = '<tr><td colspan="9" class="p-3 text-center text-slate-400">No appointments scheduled for today.</td></tr>';
+      }
+      document.getElementById('todayApptTable').innerHTML = todayHtml;
+
+      // Render Future / Upcoming Appointments
+      let futureHtml = '';
+      if (data.future && data.future.length > 0) {
+        data.future.forEach(i => {
+          futureHtml += `<tr><td class="p-3 font-bold text-teal-700">${i.date || i.next_appointment || '-'}</td><td class="p-3 font-bold">${i.opd_number}</td><td class="p-3">${i.patient_name}</td><td class="p-3">${i.phone}</td><td class="p-3">${i.procedure}</td><td class="p-3">${i.units}</td><td class="p-3">${i.operatory_chair}</td><td class="p-3">${i.time_slot || '-'}</td><td class="p-3 text-rose-600 font-bold">₹${i.pending_payment}</td><td class="p-3"><a href="https://api.whatsapp.com/send?phone=91${i.phone}" target="_blank" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">WhatsApp</a></td></tr>`;
+        });
+      } else {
+        futureHtml = '<tr><td colspan="10" class="p-3 text-center text-slate-400">No future appointments scheduled.</td></tr>';
+      }
+      document.getElementById('futureApptTable').innerHTML = futureHtml;
     }
 
     async function loadDailyLogs() {
