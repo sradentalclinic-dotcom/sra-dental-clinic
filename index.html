@@ -26,7 +26,6 @@
       padding: 0;
     }
 
-    /* Navbar */
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -49,14 +48,14 @@
     }
     .brand-sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); display: block; }
 
-    .nav-tabs { display: flex; gap: 12px; }
+    .nav-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .tab-btn {
       background: transparent;
       border: 1px solid var(--border-gold);
-      padding: 8px 18px;
+      padding: 8px 14px;
       border-radius: 4px;
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1px;
       cursor: pointer;
@@ -69,16 +68,13 @@
       border-color: var(--gold-primary);
     }
 
-    /* Main Container */
     .container { max-width: 1300px; margin: 40px auto; padding: 0 5%; }
-
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Analytics Cards */
     .analytics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       margin-bottom: 40px;
     }
@@ -90,9 +86,8 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.02);
     }
     .metric-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; }
-    .metric-value { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 700; color: var(--gold-dark); margin: 0; }
+    .metric-value { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; color: var(--gold-dark); margin: 0; }
 
-    /* Forms & Cards */
     .card {
       background: var(--card-bg);
       padding: 35px;
@@ -163,7 +158,6 @@
     }
     .btn-gold:hover { background: var(--gold-dark); }
 
-    /* Tables */
     .table-container { overflow-x: auto; }
     table {
       width: 100%;
@@ -202,7 +196,6 @@
       color: var(--gold-dark);
       border: 1px solid var(--border-gold);
     }
-
     .whatsapp-btn {
       display: inline-flex;
       align-items: center;
@@ -214,20 +207,17 @@
       text-decoration: none;
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.5px;
     }
-    .whatsapp-btn:hover { background: #1EBE5D; }
-
-    @media(max-width: 900px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .form-full, .form-half { grid-column: span 1; }
-      .navbar { flex-direction: column; gap: 15px; }
+    .xray-preview {
+      max-width: 80px;
+      max-height: 80px;
+      border-radius: 4px;
+      border: 1px solid var(--border-gold);
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
   <nav class="navbar">
     <div>
       <h2 class="brand-title">SRA DENTAL CLINIC</h2>
@@ -236,6 +226,7 @@
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" onclick="switchTab('register')">New Patient</button>
+      <button class="tab-btn" onclick="switchTab('endo')">🦷 Endo & X-Ray</button>
       <button class="tab-btn" onclick="switchTab('appointments')">Appointments</button>
       <button class="tab-btn" onclick="switchTab('logs')">Daily Log</button>
       <button class="tab-btn" onclick="switchTab('followup')">Follow-up</button>
@@ -247,226 +238,105 @@
     <!-- TAB 1: DASHBOARD -->
     <div id="dashboard" class="tab-content active">
       <div class="analytics-grid">
-        <div class="metric-card">
-          <div class="metric-title">Today's Revenue</div>
-          <div class="metric-value" id="statTodayRev">₹0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Month Revenue</div>
-          <div class="metric-value" id="statMonthRev">₹0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Pending Dues</div>
-          <div class="metric-value" id="statDues" style="color: #B91C1C;">₹0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Website Leads</div>
-          <div class="metric-value" id="statWeb">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Instagram Leads</div>
-          <div class="metric-value" id="statReel">0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Referrals</div>
-          <div class="metric-value" id="statReferral">0</div>
-        </div>
+        <div class="metric-card"><div class="metric-title">Today Revenue</div><div class="metric-value" id="statTodayRev">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Month Revenue</div><div class="metric-value" id="statMonthRev">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Pending Dues</div><div class="metric-value" id="statDues" style="color: #B91C1C;">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Web Leads</div><div class="metric-value" id="statWeb">0</div></div>
+        <div class="metric-card"><div class="metric-title">Reel Leads</div><div class="metric-value" id="statReel">0</div></div>
+        <div class="metric-card"><div class="metric-title">Referrals</div><div class="metric-value" id="statReferral">0</div></div>
       </div>
     </div>
 
-    <!-- TAB 2: REGISTER PATIENT -->
+    <!-- TAB 2: REGISTER -->
     <div id="register" class="tab-content">
       <div class="card">
         <h3>Register New Patient Consultation / Procedure</h3>
         <div class="form-grid">
-          <div>
-            <label>Patient Full Name</label>
-            <input type="text" id="regName" placeholder="e.g. Priya Sharma">
-          </div>
-          <div>
-            <label>Phone Number</label>
-            <input type="tel" id="regPhone" placeholder="e.g. 9876543210">
-          </div>
-          <div>
-            <label>Patient Location / City</label>
-            <input type="text" id="regPlace" placeholder="e.g. Mandi Dabwali" value="Mandi Dabwali">
-          </div>
-
-          <div class="form-half">
-            <label>Select Procedure</label>
-            <select id="regProc" onchange="updateProcedureDefaults()"></select>
-          </div>
-          <div class="form-half">
-            <label>Time Slot</label>
-            <select id="regTime">
-              <option value="10:00 AM">10:00 AM</option>
-              <option value="11:00 AM">11:00 AM</option>
-              <option value="12:00 PM">12:00 PM</option>
-              <option value="01:00 PM">01:00 PM</option>
-              <option value="04:30 PM">04:30 PM</option>
-              <option value="05:30 PM">05:30 PM</option>
-              <option value="06:30 PM">06:30 PM</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Procedure Base Price (₹)</label>
-            <input type="number" id="regPrice" readonly>
-          </div>
-          <div>
-            <label>Discount Offered (₹)</label>
-            <input type="number" id="regDiscount" value="0">
-          </div>
-          <div>
-            <label>Payment Collected (₹)</label>
-            <input type="number" id="regPaid" value="0">
-          </div>
-
-          <div>
-            <label>Next Appointment Date</label>
-            <input type="date" id="regNextDate">
-          </div>
-          <div>
-            <label>Lead / Referral Source</label>
-            <select id="regSource">
-              <option value="Walk-in">Walk-in</option>
-              <option value="Website">Website</option>
-              <option value="Instagram Reel">Instagram Reel</option>
-              <option value="Patient Referral">Patient Referral</option>
-              <option value="Google Search">Google Search</option>
-            </select>
-          </div>
+          <div><label>Patient Full Name</label><input type="text" id="regName" placeholder="e.g. Priya Sharma"></div>
+          <div><label>Phone Number</label><input type="tel" id="regPhone" placeholder="e.g. 9876543210"></div>
+          <div><label>Location / City</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
+          <div class="form-half"><label>Procedure</label><select id="regProc" onchange="updateProcedureDefaults()"></select></div>
+          <div class="form-half"><label>Time Slot</label><select id="regTime"><option value="10:00 AM">10:00 AM</option><option value="11:00 AM">11:00 AM</option><option value="12:00 PM">12:00 PM</option><option value="01:00 PM">01:00 PM</option><option value="04:30 PM">04:30 PM</option><option value="05:30 PM">05:30 PM</option><option value="06:30 PM">06:30 PM</option></select></div>
+          <div><label>Extracted Tooth No. (If Extraction)</label><input type="text" id="regExtracted" placeholder="e.g. 38 or 46"></div>
+          <div><label>Base Price (₹)</label><input type="number" id="regPrice" readonly></div>
+          <div><label>Discount (₹)</label><input type="number" id="regDiscount" value="0"></div>
+          <div><label>Payment Collected (₹)</label><input type="number" id="regPaid" value="0"></div>
+          <div><label>Next Appointment</label><input type="date" id="regNextDate"></div>
+          <div><label>Lead Source</label><select id="regSource"><option value="Walk-in">Walk-in</option><option value="Website">Website</option><option value="Instagram Reel">Instagram Reel</option><option value="Patient Referral">Patient Referral</option><option value="Google Search">Google Search</option></select></div>
         </div>
-
-        <div style="margin-top: 30px;">
-          <button class="btn-gold" onclick="registerPatient()">Complete Registration & Generate OPD</button>
-        </div>
+        <div style="margin-top: 30px;"><button class="btn-gold" onclick="registerPatient()">Complete Registration & Generate OPD</button></div>
         <div id="regStatus" style="margin-top: 15px; font-weight: 600; color: var(--gold-dark);"></div>
       </div>
     </div>
 
-    <!-- TAB 3: APPOINTMENTS -->
+    <!-- TAB 3: ENDO & X-RAY CHARTING -->
+    <div id="endo" class="tab-content">
+      <div class="card">
+        <h3>Endodontic Canal Charting & X-Ray Upload</h3>
+        <div class="form-grid" style="margin-bottom: 25px;">
+          <div><label>Patient OPD Number</label><input type="text" id="endoOpd" placeholder="e.g. OPD-101"></div>
+          <div>
+            <label>Select Tooth Number (FDI)</label>
+            <select id="endoTooth" onchange="loadCanalTemplate()">
+              <option value="">-- Choose Tooth --</option>
+              <option value="16">Tooth 16 (Maxillary 1st Molar - 4 Canals)</option>
+              <option value="26">Tooth 26 (Maxillary 1st Molar - 4 Canals)</option>
+              <option value="36">Tooth 36 (Mandibular 1st Molar - 3/4 Canals)</option>
+              <option value="46">Tooth 46 (Mandibular 1st Molar - 3/4 Canals)</option>
+              <option value="11">Tooth 11 (Maxillary Central Incisor - 1 Canal)</option>
+              <option value="21">Tooth 21 (Maxillary Central Incisor - 1 Canal)</option>
+            </select>
+          </div>
+          <div><label>Upload X-Ray Image</label><input type="file" id="xrayFile" accept="image/*"></div>
+        </div>
+        <button class="btn-gold" onclick="uploadXrayImage()" style="margin-bottom: 25px;">Upload & Save X-Ray</button>
+        <div id="xrayStatus" style="margin-bottom: 15px; font-weight: 600; color: var(--gold-dark);"></div>
+
+        <h4 style="font-family:'Cinzel', serif; color:var(--gold-dark); margin-top:30px;">Canal Lengths & BMP Status</h4>
+        <div id="canalsContainer"></div>
+        <div style="margin-top: 25px;"><button class="btn-gold" onclick="saveEndoChart()">Save Canal Measurements</button></div>
+        <div id="endoStatus" style="margin-top: 15px; font-weight: 600; color: var(--gold-dark);"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: APPOINTMENTS -->
     <div id="appointments" class="tab-content">
       <div class="card">
         <h3>Today's Scheduled Appointments</h3>
         <div class="table-container">
           <table>
-            <thead>
-              <tr>
-                <th>OPD</th>
-                <th>Patient Name</th>
-                <th>Location</th>
-                <th>Procedure</th>
-                <th>Time</th>
-                <th>Pending Dues</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+            <thead><tr><th>OPD</th><th>Name</th><th>Location</th><th>Procedure</th><th>Ext. Tooth</th><th>Time</th><th>Dues</th><th>Action</th></tr></thead>
             <tbody id="todayApptTable"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 30px;">
-        <h3>Upcoming Appointments</h3>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>OPD</th>
-                <th>Patient Name</th>
-                <th>Location</th>
-                <th>Procedure</th>
-                <th>Date</th>
-                <th>Time</th>
-              </tr>
-            </thead>
-            <tbody id="futureApptTable"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 30px;">
-        <h3>Scaling 6-Month Recalls</h3>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>OPD</th>
-                <th>Patient Name</th>
-                <th>Location</th>
-                <th>Last Visit</th>
-                <th>WhatsApp Reminder</th>
-              </tr>
-            </thead>
-            <tbody id="scalingTable"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4: DAILY LOG -->
+    <!-- TAB 5: DAILY LOG -->
     <div id="logs" class="tab-content">
       <div class="card">
         <h3>Patient Master & Daily Log</h3>
-        <div style="margin-bottom: 20px;">
-          <input type="text" id="searchInput" placeholder="Search by name, phone, OPD or location..." oninput="loadDailyLogs()">
-        </div>
+        <div style="margin-bottom: 20px;"><input type="text" id="searchInput" placeholder="Search by name, phone, OPD, location, or extracted tooth..." oninput="loadDailyLogs()"></div>
         <div class="table-container">
           <table>
-            <thead>
-              <tr>
-                <th>OPD</th>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Procedure</th>
-                <th>Sitting</th>
-                <th>Total</th>
-                <th>Paid</th>
-                <th>Due</th>
-                <th>Source</th>
-              </tr>
-            </thead>
+            <thead><tr><th>OPD</th><th>Date</th><th>Name & Phone</th><th>Location</th><th>Procedure</th><th>Ext. Tooth</th><th>Sitting</th><th>Total</th><th>Paid</th><th>Due</th><th>X-Ray</th><th>Source</th></tr></thead>
             <tbody id="logsTable"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TAB 5: FOLLOW UP -->
+    <!-- TAB 6: FOLLOW UP -->
     <div id="followup" class="tab-content">
       <div class="card" style="max-width: 650px; margin: 0 auto;">
         <h3>Log Patient Follow-Up Sitting</h3>
         <div class="form-grid" style="grid-template-columns: 1fr;">
-          <div>
-            <label>OPD Number</label>
-            <input type="text" id="fuOpd" placeholder="e.g. OPD-101">
-          </div>
-          <div>
-            <label>Payment Collected This Sitting (₹)</label>
-            <input type="number" id="fuPaid" value="0">
-          </div>
-          <div>
-            <label>Time Slot</label>
-            <select id="fuTime">
-              <option value="10:00 AM">10:00 AM</option>
-              <option value="11:00 AM">11:00 AM</option>
-              <option value="12:00 PM">12:00 PM</option>
-              <option value="01:00 PM">01:00 PM</option>
-              <option value="04:30 PM">04:30 PM</option>
-              <option value="05:30 PM">05:30 PM</option>
-              <option value="06:30 PM">06:30 PM</option>
-            </select>
-          </div>
-          <div>
-            <label>Next Appointment Date</label>
-            <input type="date" id="fuNextDate" onchange="checkSunday(this)">
-          </div>
+          <div><label>OPD Number</label><input type="text" id="fuOpd" placeholder="e.g. OPD-101"></div>
+          <div><label>Payment Collected This Sitting (₹)</label><input type="number" id="fuPaid" value="0"></div>
+          <div><label>Time Slot</label><select id="fuTime"><option value="10:00 AM">10:00 AM</option><option value="11:00 AM">11:00 AM</option><option value="12:00 PM">12:00 PM</option><option value="01:00 PM">01:00 PM</option><option value="04:30 PM">04:30 PM</option><option value="05:30 PM">05:30 PM</option><option value="06:30 PM">06:30 PM</option></select></div>
+          <div><label>Next Appointment Date</label><input type="date" id="fuNextDate" onchange="checkSunday(this)"></div>
         </div>
-        <div style="margin-top: 30px;">
-          <button class="btn-gold" onclick="submitFollowUp()">Save Follow-Up Details</button>
-        </div>
+        <div style="margin-top: 30px;"><button class="btn-gold" onclick="submitFollowUp()">Save Follow-Up Details</button></div>
         <div id="fuStatus" style="margin-top: 15px; font-weight: 600; color: var(--gold-dark);"></div>
       </div>
     </div>
@@ -489,7 +359,6 @@
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       event.currentTarget.classList.add('active');
-      
       if(tabId === 'dashboard') loadAnalytics();
       if(tabId === 'appointments') loadAppointments();
       if(tabId === 'logs') loadDailyLogs();
@@ -501,23 +370,14 @@
       const select = document.getElementById('regProc');
       select.innerHTML = '<option value="">-- Choose Procedure --</option>';
       proceduresData.forEach(p => {
-        select.innerHTML += `<option value="${p.id}" data-price="${p.price}" data-gap="${p.gap_days}">${p.name} (₹${p.price})</option>`;
+        select.innerHTML += `<option value="${p.id}" data-price="${p.price}">${p.name} (₹${p.price})</option>`;
       });
     }
 
     function updateProcedureDefaults() {
       const select = document.getElementById('regProc');
       const opt = select.options[select.selectedIndex];
-      const price = opt.getAttribute('data-price') || 0;
-      const gap = parseInt(opt.getAttribute('data-gap') || 0);
-
-      document.getElementById('regPrice').value = price;
-      
-      if(gap > 0) {
-        const d = new Date();
-        d.setDate(d.getDate() + gap);
-        document.getElementById('regNextDate').valueAsDate = d;
-      }
+      document.getElementById('regPrice').value = opt.getAttribute('data-price') || 0;
     }
 
     async function loadAnalytics() {
@@ -542,13 +402,9 @@
         discount: parseFloat(document.getElementById('regDiscount').value || 0),
         payment_done: parseFloat(document.getElementById('regPaid').value || 0),
         next_appointment: document.getElementById('regNextDate').value || null,
-        source: document.getElementById('regSource').value
+        source: document.getElementById('regSource').value,
+        extracted_tooth: document.getElementById('regExtracted').value || null
       };
-
-      if(!payload.patient_name || !payload.phone_number || !payload.procedure_id) {
-        alert('Please fill out all required fields!');
-        return;
-      }
 
       const res = await fetch('/patients', {
         method: 'POST',
@@ -556,112 +412,99 @@
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      document.getElementById('regStatus').innerHTML = `✅ Patient successfully registered! OPD Reference: <b>${data.opd_number}</b>`;
+      document.getElementById('regStatus').innerHTML = `✅ Registered successfully! OPD Reference: <b>${data.opd_number}</b>`;
       loadAnalytics();
+    }
+
+    function loadCanalTemplate() {
+      const tooth = document.getElementById('endoTooth').value;
+      const container = document.getElementById('canalsContainer');
+      let canals = [];
+      if(tooth === "16" || tooth === "26") canals = ["MB1", "MB2", "DB", "Palatal"];
+      else if(tooth === "36" || tooth === "46") canals = ["MB", "ML", "Distal"];
+      else canals = ["Main Canal"];
+
+      let html = `<table><thead><tr><th>Canal Name</th><th>Working Length (mm)</th><th>BMP Done Upto (mm)</th><th>Notes</th></tr></thead><tbody>`;
+      canals.forEach((c, idx) => {
+        html += `<tr><td><b>${c}</b></td><td><input type="number" step="0.5" id="len_${idx}"></td><td><input type="number" step="0.5" id="bmp_${idx}"></td><td><input type="text" id="note_${idx}"></td></tr>`;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+      container.dataset.canals = JSON.stringify(canals);
+    }
+
+    async function uploadXrayImage() {
+      const opd = document.getElementById('endoOpd').value;
+      const fileInput = document.getElementById('xrayFile');
+      if(!opd || fileInput.files.length === 0) { alert('Enter OPD and select image!'); return; }
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      const res = await fetch(`/patients/${opd}/upload-xray`, { method: 'POST', body: formData });
+      if(res.ok) document.getElementById('xrayStatus').innerText = "✅ X-ray uploaded successfully!";
+    }
+
+    async function saveEndoChart() {
+      const opd = document.getElementById('endoOpd').value;
+      const tooth = document.getElementById('endoTooth').value;
+      const canals = JSON.parse(document.getElementById('canalsContainer').dataset.canals || "[]");
+      let dataToSave = [];
+      canals.forEach((c, idx) => {
+        dataToSave.push({ canal_name: c, working_length: document.getElementById(`len_${idx}`).value, bmp_done: document.getElementById(`bmp_${idx}`).value, notes: document.getElementById(`note_${idx}`).value });
+      });
+      const res = await fetch('/patients/endo-chart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ opd_number: opd, tooth_number: tooth, canals_data: JSON.stringify(dataToSave) })
+      });
+      if(res.ok) document.getElementById('endoStatus').innerText = "✅ Endo measurements saved successfully!";
     }
 
     async function loadAppointments() {
       const res = await fetch('/views/appointments');
       const data = await res.json();
-
       let todayHtml = '';
       data.today.forEach(i => {
-        todayHtml += `<tr>
-          <td><span class="badge">${i.opd_number}</span></td>
-          <td><b>${i.patient_name}</b></td>
-          <td>${i.patient_place || 'Dabwali'}</td>
-          <td>${i.procedure}</td>
-          <td>${i.time_slot}</td>
-          <td style="color: #B91C1C; font-weight: 700;">₹${i.pending_payment}</td>
-          <td><a href="${i.whatsapp_link}" class="whatsapp-btn" target="_blank">WhatsApp</a></td>
-        </tr>`;
+        todayHtml += `<tr><td><span class="badge">${i.opd_number}</span></td><td><b>${i.patient_name}</b></td><td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.extracted_tooth ? `<span class="badge" style="background:#FEF3C7;color:#92400E;">Tooth ${i.extracted_tooth}</span>` : '-'}</td><td>${i.time_slot}</td><td style="color:#B91C1C;font-weight:700;">₹${i.pending_payment}</td><td><a href="${i.whatsapp_link}" class="whatsapp-btn" target="_blank">WhatsApp</a></td></tr>`;
       });
-      document.getElementById('todayApptTable').innerHTML = todayHtml || `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No appointments today.</td></tr>`;
-
-      let futureHtml = '';
-      data.future.forEach(i => {
-        futureHtml += `<tr>
-          <td><span class="badge">${i.opd_number}</span></td>
-          <td><b>${i.patient_name}</b></td>
-          <td>${i.patient_place || 'Dabwali'}</td>
-          <td>${i.procedure}</td>
-          <td>${i.next_appointment}</td>
-          <td>${i.time_slot}</td>
-        </tr>`;
-      });
-      document.getElementById('futureApptTable').innerHTML = futureHtml || `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No upcoming future appointments.</td></tr>`;
-
-      let scaleHtml = '';
-      data.scaling_recall.forEach(i => {
-        scaleHtml += `<tr>
-          <td><span class="badge">${i.opd_number}</span></td>
-          <td><b>${i.patient_name}</b></td>
-          <td>${i.patient_place || 'Dabwali'}</td>
-          <td>${i.last_date}</td>
-          <td><a href="${i.whatsapp_link}" class="whatsapp-btn" target="_blank">Send Reminder</a></td>
-        </tr>`;
-      });
-      document.getElementById('scalingTable').innerHTML = scaleHtml || `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No scaling recalls due.</td></tr>`;
+      document.getElementById('todayApptTable').innerHTML = todayHtml || `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No appointments today.</td></tr>`;
     }
 
     async function loadDailyLogs() {
       const search = document.getElementById('searchInput').value;
-      const url = search ? `/views/daily-log?search=${encodeURIComponent(search)}` : '/views/daily-log';
-      const res = await fetch(url);
+      const res = await fetch(search ? `/views/daily-log?search=${encodeURIComponent(search)}` : '/views/daily-log');
       const data = await res.json();
 
       let html = '';
       data.forEach(p => {
+        let xrayHtml = p.xray_path ? `<a href="${p.xray_path}" target="_blank"><img src="${p.xray_path}" class="xray-preview"></a>` : 'No X-Ray';
+        let extBadge = p.extracted_tooth ? `<span class="badge" style="background:#FEF3C7;color:#92400E;">Tooth ${p.extracted_tooth}</span>` : '-';
         html += `<tr>
           <td><span class="badge">${p.opd_number}</span></td>
           <td>${p.date}</td>
           <td><b>${p.patient_name}</b><br><small style="color:var(--text-muted);">${p.phone_number}</small></td>
-          <td>${p.patient_place || 'Dabwali'}</td>
+          <td>${p.patient_place}</td>
           <td>${p.procedure}</td>
+          <td>${extBadge}</td>
           <td>${p.current_sitting} / ${p.total_sittings}</td>
           <td>₹${p.total_amount}</td>
-          <td style="color: #15803D; font-weight: 700;">₹${p.total_paid}</td>
-          <td style="color: #B91C1C; font-weight: 700;">₹${p.payment_left}</td>
-          <td><span class="badge" style="background:#FFF; border-color:var(--gold-primary);">${p.source}</span></td>
+          <td style="color:#15803D;font-weight:700;">₹${p.total_paid}</td>
+          <td style="color:#B91C1C;font-weight:700;">₹${p.payment_left}</td>
+          <td>${xrayHtml}</td>
+          <td><span class="badge">${p.source}</span></td>
         </tr>`;
       });
-      document.getElementById('logsTable').innerHTML = html || `<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">No records found.</td></tr>`;
+      document.getElementById('logsTable').innerHTML = html || `<tr><td colspan="12" style="text-align:center; color:var(--text-muted);">No records found.</td></tr>`;
     }
 
     function checkSunday(input) {
-      const d = new Date(input.value);
-      if(d.getDay() === 0) {
-        alert('Sunday is reserved for new patients only! Please choose another day.');
-        input.value = '';
-      }
+      if(new Date(input.value).getDay() === 0) { alert('Sunday is reserved for new patients only!'); input.value = ''; }
     }
 
     async function submitFollowUp() {
-      const payload = {
-        opd_number: document.getElementById('fuOpd').value,
-        payment_done: parseFloat(document.getElementById('fuPaid').value || 0),
-        time_slot: document.getElementById('fuTime').value,
-        next_appointment: document.getElementById('fuNextDate').value || null
-      };
-
-      if(!payload.opd_number) {
-        alert('Please enter OPD Number!');
-        return;
-      }
-
-      const res = await fetch('/patients/follow-up', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      if(res.ok) {
-        document.getElementById('fuStatus').innerText = "✅ Follow-up sitting logged successfully!";
-        loadAnalytics();
-      } else {
-        const err = await res.json();
-        alert(err.detail || 'Error logging follow-up');
-      }
+      const payload = { opd_number: document.getElementById('fuOpd').value, payment_done: parseFloat(document.getElementById('fuPaid').value || 0), time_slot: document.getElementById('fuTime').value, next_appointment: document.getElementById('fuNextDate').value || null };
+      const res = await fetch('/patients/follow-up', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if(res.ok) { document.getElementById('fuStatus').innerText = "✅ Follow-up logged successfully!"; loadAnalytics(); }
+      else { const err = await res.json(); alert(err.detail || 'Error logging follow-up'); }
     }
   </script>
 </body>
