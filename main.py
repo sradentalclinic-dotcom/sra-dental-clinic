@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, List
 import os
 import json
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
@@ -30,9 +30,11 @@ class PatientModel(Base):
     __tablename__ = "patients"
     opd_number = Column(String, primary_key=True, index=True)
     patient_name = Column(String)
+    age = Column(Integer, nullable=True)
     phone_number = Column(String)
     patient_place = Column(String, default="Mandi Dabwali")
     procedure_id = Column(Integer)
+    units = Column(Integer, default=1)
     total_sittings = Column(Integer, default=1)
     current_sitting = Column(Integer, default=1)
     base_price = Column(Float, default=0.0)
@@ -56,6 +58,20 @@ class EndoChartModel(Base):
     opd_number = Column(String, index=True)
     tooth_number = Column(String)
     canals_data = Column(Text)
+
+class LabWorkModel(Base):
+    __tablename__ = "lab_works"
+    id = Column(Integer, primary_key=True, index=True)
+    opd_number = Column(String, index=True)
+    patient_name = Column(String)
+    lab_item = Column(String)
+    units = Column(Integer, default=1)
+    cost_per_unit = Column(Float)
+    total_lab_cost = Column(Float)
+    lab_name = Column(String, default="Premier Dental Lab")
+    status = Column(String, default="Sent to Lab")
+    payment_status = Column(String, default="Pending")
+    created_date = Column(Date, default=date.today)
 
 Base.metadata.create_all(bind=engine)
 
@@ -92,14 +108,14 @@ def get_procedures(db: Session = Depends(get_db)):
         defaults = [
             ProcedureModel(name="RCT ANTERIOR", price=2000, gap_days=3, total_sittings=3),
             ProcedureModel(name="RCT POSTERIOR", price=2500, gap_days=3, total_sittings=3),
-            ProcedureModel(name="RCT PEDO", price=2000, gap_days=3, total_sittings=3),
             ProcedureModel(name="CONSULTATION", price=100, gap_days=0, total_sittings=1),
-            ProcedureModel(name="TEMPORARY FILLING", price=100, gap_days=0, total_sittings=1),
             ProcedureModel(name="EXTRACTION", price=500, gap_days=2, total_sittings=2),
-            ProcedureModel(name="SURGICAL EXTRACTION", price=3000, gap_days=7, total_sittings=2),
             ProcedureModel(name="SCALING", price=1000, gap_days=0, total_sittings=1),
             ProcedureModel(name="PFM CROWN", price=2000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="ZIRCONIA CROWN", price=4000, gap_days=3, total_sittings=2)
+            ProcedureModel(name="ZIRCONIA CROWN", price=4000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="FULL DENTURE", price=8000, gap_days=5, total_sittings=3),
+            ProcedureModel(name="METAL CAP", price=1000, gap_days=3, total_sittings=2),
+            ProcedureModel(name="RPD", price=500, gap_days=3, total_sittings=2)
         ]
         db.add_all(defaults)
         db.commit()
@@ -114,23 +130,28 @@ def get_analytics(db: Session = Depends(get_db)):
     month_revenue = sum(p.total_paid for p in patients if p.created_date and p.created_date.month == today.month and p.created_date.year == today.year)
     total_dues = sum(p.payment_left for p in patients)
     today_opd = sum(1 for p in patients if p.created_date == today)
-    total_opd = len(patients)
     
+    lab_orders = db.query(LabWorkModel).all()
+    total_lab_dues = sum(l.total_lab_cost for l in lab_orders if l.payment_status == "Pending")
+
     return {
         "today_revenue": today_revenue,
         "month_revenue": month_revenue,
         "total_dues": total_dues,
         "today_opd": today_opd,
-        "total_opd": total_opd,
+        "total_opd": len(patients),
+        "total_lab_dues": total_lab_dues,
         "reel_leads": sum(1 for p in patients if p.source == "Instagram Reel"),
         "web_leads": sum(1 for p in patients if p.source == "Website")
     }
 
 class PatientCreate(BaseModel):
     patient_name: str
+    age: Optional[int] = None
     phone_number: str
     patient_place: Optional[str] = "Mandi Dabwali"
     procedure_id: int
+    units: int = 1
     time_slot: Optional[str] = "10:00"
     payment_done: float = 0.0
     discount: float = 0.0
@@ -147,10 +168,12 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     opd_number = f"OPD-{100 + count}"
     proc = db.query(ProcedureModel).filter(ProcedureModel.id == data.procedure_id).first()
     base_amt = proc.price if proc else 0.0
-    total_amt = max(0.0, base_amt - data.discount)
+    units_cnt = max(1, data.units)
+    
+    # Auto calculation: (Base Price * Units) - Discount
+    total_amt = max(0.0, (base_amt * units_cnt) - data.discount)
     payment_left = max(0.0, total_amt - data.payment_done)
 
-    # Safe Date Parsing
     next_date = None
     if data.next_appointment and data.next_appointment.strip():
         try:
@@ -161,9 +184,11 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     new_patient = PatientModel(
         opd_number=opd_number,
         patient_name=data.patient_name,
+        age=data.age,
         phone_number=data.phone_number,
         patient_place=data.patient_place or "Mandi Dabwali",
         procedure_id=data.procedure_id,
+        units=units_cnt,
         total_sittings=proc.total_sittings if proc else 1,
         base_price=base_amt,
         discount=data.discount,
@@ -185,9 +210,11 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
 
 class PatientUpdate(BaseModel):
     patient_name: Optional[str] = None
+    age: Optional[int] = None
     phone_number: Optional[str] = None
     patient_place: Optional[str] = None
     procedure_id: Optional[int] = None
+    units: Optional[int] = None
     time_slot: Optional[str] = None
     payment_done: Optional[float] = None
     discount: Optional[float] = None
@@ -202,9 +229,11 @@ def update_patient(opd_number: str, data: PatientUpdate, db: Session = Depends(g
         raise HTTPException(status_code=404, detail="Patient record not found")
     
     if data.patient_name is not None: patient.patient_name = data.patient_name
+    if data.age is not None: patient.age = data.age
     if data.phone_number is not None: patient.phone_number = data.phone_number
     if data.patient_place is not None: patient.patient_place = data.patient_place
     if data.operatory_chair is not None: patient.operatory_chair = data.operatory_chair
+    if data.units is not None: patient.units = max(1, data.units)
     if data.time_slot is not None: patient.time_slot = data.time_slot
     if data.next_appointment_time is not None: patient.next_appointment_time = data.next_appointment_time
     
@@ -218,7 +247,8 @@ def update_patient(opd_number: str, data: PatientUpdate, db: Session = Depends(g
     if data.discount is not None: patient.discount = data.discount
     if data.payment_done is not None: patient.total_paid = data.payment_done
     
-    patient.total_amount = max(0.0, patient.base_price - patient.discount)
+    # Auto Recalculate
+    patient.total_amount = max(0.0, (patient.base_price * patient.units) - patient.discount)
     patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
 
     if data.next_appointment is not None:
@@ -233,6 +263,18 @@ def update_patient(opd_number: str, data: PatientUpdate, db: Session = Depends(g
     db.commit()
     return {"message": "Patient updated successfully"}
 
+@app.delete("/patients/{opd_number}")
+def delete_patient(opd_number: str, db: Session = Depends(get_db)):
+    patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient record not found")
+    
+    db.query(EndoChartModel).filter(EndoChartModel.opd_number == opd_number).delete()
+    db.query(LabWorkModel).filter(LabWorkModel.opd_number == opd_number).delete()
+    db.delete(patient)
+    db.commit()
+    return {"message": f"Patient {opd_number} permanently deleted"}
+
 @app.get("/patients/{opd_number}")
 def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
@@ -246,9 +288,13 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
     return {
         "opd_number": patient.opd_number,
         "patient_name": patient.patient_name,
+        "age": patient.age,
         "phone_number": patient.phone_number,
         "patient_place": patient.patient_place,
+        "procedure_id": patient.procedure_id,
         "procedure_name": proc.name if proc else "General",
+        "units": patient.units,
+        "base_price": patient.base_price,
         "total_amount": patient.total_amount,
         "total_paid": patient.total_paid,
         "payment_left": patient.payment_left,
@@ -260,6 +306,87 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
         "next_appointment_time": patient.next_appointment_time,
         "charts": saved_charts
     }
+
+# LAB WORK BILLING ENDPOINTS
+LAB_RATES = {
+    "PFM": 350.0,
+    "Zirconia": 900.0,
+    "Denture": 1100.0,
+    "Metal Cap": 150.0,
+    "RPD": 50.0
+}
+
+@app.get("/lab-rates")
+def get_lab_rates():
+    return LAB_RATES
+
+class LabWorkCreate(BaseModel):
+    opd_number: str
+    lab_item: str
+    units: int = 1
+    lab_name: Optional[str] = "Premier Dental Lab"
+
+@app.post("/lab-orders")
+def create_lab_order(data: LabWorkCreate, db: Session = Depends(get_db)):
+    patient = db.query(PatientModel).filter(PatientModel.opd_number == data.opd_number).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient OPD number not found")
+
+    cost_per_unit = LAB_RATES.get(data.lab_item, 0.0)
+    units_cnt = max(1, data.units)
+    total_lab_cost = cost_per_unit * units_cnt
+
+    lab_order = LabWorkModel(
+        opd_number=data.opd_number,
+        patient_name=patient.patient_name,
+        lab_item=data.lab_item,
+        units=units_cnt,
+        cost_per_unit=cost_per_unit,
+        total_lab_cost=total_lab_cost,
+        lab_name=data.lab_name or "Premier Dental Lab",
+        status="Sent to Lab",
+        payment_status="Pending"
+    )
+    db.add(lab_order)
+    db.commit()
+    db.refresh(lab_order)
+    return {"message": "Lab Work order added successfully", "order_id": lab_order.id}
+
+@app.get("/lab-orders")
+def list_lab_orders(db: Session = Depends(get_db)):
+    orders = db.query(LabWorkModel).order_by(LabWorkModel.id.desc()).all()
+    return [{
+        "id": o.id,
+        "opd_number": o.opd_number,
+        "patient_name": o.patient_name,
+        "lab_item": o.lab_item,
+        "units": o.units,
+        "cost_per_unit": o.cost_per_unit,
+        "total_lab_cost": o.total_lab_cost,
+        "lab_name": o.lab_name,
+        "status": o.status,
+        "payment_status": o.payment_status,
+        "date": o.created_date.isoformat() if o.created_date else None
+    } for o in orders]
+
+@app.put("/lab-orders/{order_id}")
+def update_lab_order(order_id: int, status: Optional[str] = None, payment_status: Optional[str] = None, db: Session = Depends(get_db)):
+    order = db.query(LabWorkModel).filter(LabWorkModel.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Lab order not found")
+    if status: order.status = status
+    if payment_status: order.payment_status = payment_status
+    db.commit()
+    return {"message": "Lab order updated successfully"}
+
+@app.delete("/lab-orders/{order_id}")
+def delete_lab_order(order_id: int, db: Session = Depends(get_db)):
+    order = db.query(LabWorkModel).filter(LabWorkModel.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Lab order not found")
+    db.delete(order)
+    db.commit()
+    return {"message": "Lab order removed"}
 
 @app.post("/patients/{opd_number}/upload-treatment-file")
 async def upload_treatment_file(
@@ -312,9 +439,11 @@ def get_appointments(db: Session = Depends(get_db)):
         item = {
             "opd_number": p.opd_number,
             "patient_name": p.patient_name,
+            "age": p.age,
             "phone": p.phone_number,
             "patient_place": p.patient_place,
             "procedure": proc.name if proc else "General",
+            "units": p.units,
             "time_slot": p.time_slot,
             "pending_payment": p.payment_left,
             "operatory_chair": p.operatory_chair,
@@ -341,9 +470,11 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "opd_number": p.opd_number,
             "date": p.created_date.isoformat(),
             "patient_name": p.patient_name,
+            "age": p.age,
             "phone": p.phone_number,
             "patient_place": p.patient_place,
             "procedure": proc.name if proc else "General",
+            "units": p.units,
             "current_sitting": p.current_sitting,
             "total_sittings": p.total_sittings,
             "total_amount": p.total_amount,
