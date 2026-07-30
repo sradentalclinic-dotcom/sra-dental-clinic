@@ -109,8 +109,8 @@
     <div id="treatment" class="tab-content">
       <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-5xl mx-auto mb-8">
         <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Clinical XML EHR Import Suite</h2>
-        <p class="text-xs text-slate-500 mb-4">Paste your clinic's XML export to instantly populate patient records, canal working lengths, surgical extractions, and DICOM attachments.</p>
-        <textarea id="xmlImportInput" rows="5" class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono mb-4 focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Paste DentalEHR_Export XML here..."></textarea>
+        <p class="text-xs text-slate-500 mb-4">Paste your clinic's XML export to instantly populate patient records, arch summaries, canal working lengths, surgical extractions, and DICOM attachments.</p>
+        <textarea id="xmlImportInput" rows="6" class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono mb-4 focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Paste DentalEHR_Export XML here..."></textarea>
         <button onclick="importEHRXML()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all">Import & Parse EHR XML</button>
         <p id="xmlImportStatus" class="mt-2 text-xs font-bold text-teal-600"></p>
       </div>
@@ -126,7 +126,7 @@
         <div id="dynamicTreatmentArea" class="hidden">
           <div class="p-4 rounded-xl bg-slate-100 text-slate-800 font-bold text-sm mb-6" id="treatPatientInfo"></div>
 
-          <!-- Advanced Clinical Records Viewer -->
+          <!-- Advanced Clinical Records & Arch Summary Viewer -->
           <div id="clinicalRecordsViewer" class="mb-6 space-y-6"></div>
 
           <!-- Edit Section -->
@@ -357,12 +357,29 @@
       document.getElementById('editDiscount').value = patient.discount;
       updateEditCalculations();
 
-      // Load Clinical Records (Extractions, Endos, Attachments)
+      // Load Clinical Records (Arch Summary, Extractions, Endos, Attachments)
       const clinicalRes = await fetch(`/patients/${opd}/clinical-records`);
       const clinical = await clinicalRes.json();
       
       let viewerHtml = '';
       
+      if(clinical.arch_summary) {
+        const arch = clinical.arch_summary;
+        viewerHtml += `<div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <h4 class="font-bold text-amber-900 text-xs uppercase mb-2">Operatory Arch Summary Overview</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="p-3 bg-white rounded-lg border border-amber-100">
+              <span class="font-bold text-amber-900">Maxillary Upper Arch:</span> <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold">${arch.maxillary_status}</span>
+              <p class="text-slate-600 mt-1">${arch.maxillary_notes}</p>
+            </div>
+            <div class="p-3 bg-white rounded-lg border border-amber-100">
+              <span class="font-bold text-amber-900">Mandibular Lower Arch:</span> <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">${arch.mandibular_status}</span>
+              <p class="text-slate-600 mt-1">Active Teeth Count: <b>${arch.mandibular_teeth_count} teeth</b></p>
+            </div>
+          </div>
+        </div>`;
+      }
+
       if(clinical.extractions.length > 0) {
         viewerHtml += `<div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
           <h4 class="font-bold text-rose-900 text-xs uppercase mb-2">Surgical Extractions Record</h4>`;
