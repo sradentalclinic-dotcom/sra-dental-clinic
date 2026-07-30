@@ -4,57 +4,270 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SRA Dental Enterprise Operatory Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #F8FAF9; --card: #FFFFFF; --gold: #9A7B38; --gold-dark: #7A5F26; --accent: #1E293B; --border: #E2E8F0; --soft-bg: #F1F5F9; --whatsapp: #16A34A; }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #0F172A; margin: 0; padding: 0; }
-    
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 4%; background: #FFF; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-    .brand-title { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold-dark); margin: 0; font-weight: 700; letter-spacing: 0.5px; }
-    
-    .nav-tabs { display: flex; gap: 8px; }
-    .tab-btn { background: transparent; border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; color: #475569; }
-    .tab-btn.active, .tab-btn:hover { background: var(--gold); color: #FFF; border-color: var(--gold); }
-    
-    .container { max-width: 1280px; margin: 25px auto; padding: 0 3%; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    
-    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 25px; }
-    .metric-card { background: var(--card); padding: 18px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-    .metric-title { font-size: 10px; text-transform: uppercase; color: #64748B; font-weight: 700; margin-bottom: 6px; }
-    .metric-value { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; color: var(--gold-dark); margin: 0; }
-    
-    .card { background: var(--card); padding: 24px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
-    .card h3 { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold-dark); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-    
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
-    label { font-size: 11px; font-weight: 700; color: #334155; text-transform: uppercase; display: block; margin-bottom: 5px; }
-    input, select, textarea { width: 100%; padding: 9px 12px; background: #FFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
-    
-    .btn-gold { background: var(--gold); color: #FFF; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 11px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-    .btn-gold:hover { background: var(--gold-dark); }
-    .btn-wa { background: var(--whatsapp); color: #FFF; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
-    .btn-wa:hover { background: #15803D; }
-    .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold-dark); }
-    .btn-danger { background: #E11D48; color: #FFF; }
-    
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid var(--border); }
-    th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
-    th { background: #F8FAFC; font-family: 'Cinzel', serif; color: var(--gold-dark); font-weight: 700; }
-    
-    .dynamic-section { background: var(--soft-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-top: 20px; }
-    .file-upload-box { border: 2px dashed var(--gold); padding: 15px; border-radius: 6px; background: #FFF; text-align: center; }
+    :root {
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --primary: #0F172A;
+      --accent: #2563EB;
+      --accent-hover: #1D4ED8;
+      --emerald: #059669;
+      --amber: #D97706;
+      --border: #E2E8F0;
+      --soft-bg: #F1F5F9;
+      --whatsapp: #16A34A;
+      --danger: #E11D48;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: #0F172A;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 4%;
+      background: var(--primary);
+      color: #FFF;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      color: #FFF;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title span {
+      color: #38BDF8;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #E2E8F0;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--accent);
+      color: #FFF;
+      border-color: var(--accent);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 25px auto;
+      padding: 0 3%;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 25px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .metric-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #64748B;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      margin-bottom: 25px;
+    }
+
+    .card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      color: var(--primary);
+      margin-top: 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 9px 12px;
+      background: #FFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      font-size: 13px;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn-gold {
+      background: var(--accent);
+      color: #FFF;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-gold:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-wa {
+      background: var(--whatsapp);
+      color: #FFF;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-wa:hover {
+      background: #15803D;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #FFF;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #F8FAFC;
+      font-family: 'Outfit', sans-serif;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .dynamic-section {
+      background: var(--soft-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-top: 20px;
+    }
+
+    .file-upload-box {
+      border: 2px dashed var(--accent);
+      padding: 15px;
+      border-radius: 6px;
+      background: #FFF;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <nav class="navbar">
-    <h2 class="brand-title">SRA DENTAL OPERATORY</h2>
+    <h2 class="brand-title">🦷 SRA DENTAL <span>OPERATORY</span></h2>
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" onclick="switchTab('register')">New Patient</button>
-      <button class="tab-btn" onclick="switchTab('treatment')" style="background:#FEF3C7; color:#92400E; border-color:#F59E0B;">Clinical Operatory Chart</button>
+      <button class="tab-btn" onclick="switchTab('treatment')" style="background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE;">Clinical Operatory Chart</button>
       <button class="tab-btn" onclick="switchTab('appointments')">Appointments</button>
       <button class="tab-btn" onclick="switchTab('logs')">Daily Logs & Recall</button>
     </div>
@@ -112,10 +325,10 @@
       </div>
     </div>
 
-    <!-- 3. CLINICAL OPERATORY & HAND-TYPED ENDO CHARTING -->
+    <!-- 3. CLINICAL OPERATORY & EDITABLE PATIENT DETAILS -->
     <div id="treatment" class="tab-content">
       <div class="card">
-        <h3>Enterprise Operatory & Hand-Typed Endo Charting</h3>
+        <h3>Enterprise Operatory Charting & Patient Record Edit</h3>
         
         <div class="form-grid" style="align-items: end; border-bottom: 2px solid var(--border); padding-bottom: 15px;">
           <div><label>Enter Patient OPD Number</label><input type="text" id="treatOpd" placeholder="e.g. OPD-101"></div>
@@ -123,10 +336,33 @@
         </div>
 
         <div id="dynamicTreatmentArea" style="display: none; margin-top: 20px;">
-          <h4 id="treatPatientInfo" style="font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-dark); margin-bottom: 15px;"></h4>
+          <h4 id="treatPatientInfo" style="font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--primary); margin-bottom: 15px;"></h4>
+
+          <!-- EDIT PATIENT DETAILS CARD -->
+          <div class="card" style="background: #F0F9FF; border: 1px solid #BAE6FD;">
+            <h3 style="margin-top:0; color: #0369A1;">✏️ Edit Patient Record</h3>
+            <div class="form-grid">
+              <div><label>Patient Full Name</label><input type="text" id="editName"></div>
+              <div><label>Phone Number</label><input type="text" id="editPhone"></div>
+              <div><label>Place / City</label><input type="text" id="editPlace"></div>
+              <div><label>Operatory Chair</label>
+                <select id="editChair">
+                  <option value="Operatory 1">Operatory 1</option>
+                  <option value="Operatory 2">Operatory 2</option>
+                  <option value="Surgical Suite">Surgical Suite</option>
+                </select>
+              </div>
+              <div><label>Total Payment Received (₹)</label><input type="number" id="editPaid"></div>
+              <div><label>Discount Given (₹)</label><input type="number" id="editDiscount"></div>
+              <div><label>Next Appt Date</label><input type="date" id="editNextDate"></div>
+              <div><label>Next Appt Time</label><input type="time" id="editNextTime"></div>
+            </div>
+            <button class="btn-gold" style="margin-top:15px; background: #0284C7;" onclick="updatePatientDetails()">Save Record Changes</button>
+            <span id="updateStatus" style="margin-left:10px; font-weight:bold; color:#16A34A;"></span>
+          </div>
 
           <div class="dynamic-section">
-            <h3 style="margin-top: 0; color: var(--gold-dark); border-bottom: none;">🦷 Tooth & Canal Operatory Charting</h3>
+            <h3 style="margin-top: 0; color: var(--primary); border-bottom: none;">🦷 Tooth & Canal Operatory Charting</h3>
             
             <div class="form-grid">
               <div>
@@ -140,10 +376,10 @@
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
               <button class="btn-gold btn-outline" type="button" onclick="addCustomCanalRow()">+ Add Custom Canal Row</button>
-              <button class="btn-gold" style="background: #15803D;" type="button" onclick="saveEndoData()">Save Operatory Charting Data</button>
+              <button class="btn-gold" style="background: var(--emerald);" type="button" onclick="saveEndoData()">Save Operatory Charting Data</button>
             </div>
 
-            <h4 style="margin-top: 25px; font-family: 'Cinzel', serif; color: var(--gold-dark);">📁 Operatory File Attachments</h4>
+            <h4 style="margin-top: 25px; font-family: 'Outfit', sans-serif; color: var(--primary);">📁 Operatory File Attachments</h4>
             <div class="form-grid">
               <div class="file-upload-box">
                 <label>Upload X-Ray File</label>
@@ -354,9 +590,56 @@
         const res = await fetch(`/patients/${opd}`);
         if(!res.ok) { alert("Patient record not found!"); return; }
         const patient = await res.json();
+        
         document.getElementById('dynamicTreatmentArea').style.display = 'block';
         document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} (${patient.patient_place}) | OPD: ${patient.opd_number} | Chair: ${patient.operatory_chair} | Procedure: ${patient.procedure_name}`;
+
+        // Populate Edit Form Inputs
+        document.getElementById('editName').value = patient.patient_name || '';
+        document.getElementById('editPhone').value = patient.phone_number || '';
+        document.getElementById('editPlace').value = patient.patient_place || '';
+        document.getElementById('editChair').value = patient.operatory_chair || 'Operatory 1';
+        document.getElementById('editPaid').value = patient.total_paid || 0;
+        document.getElementById('editDiscount').value = patient.discount || 0;
+        document.getElementById('editNextDate').value = patient.next_appointment || '';
+        document.getElementById('editNextTime').value = patient.next_appointment_time || '';
       } catch (e) { alert("Error connecting to server."); }
+    }
+
+    async function updatePatientDetails() {
+      const opd = document.getElementById('treatOpd').value;
+      if(!opd) return;
+
+      const payload = {
+        patient_name: document.getElementById('editName').value,
+        phone_number: document.getElementById('editPhone').value,
+        patient_place: document.getElementById('editPlace').value,
+        operatory_chair: document.getElementById('editChair').value,
+        payment_done: parseFloat(document.getElementById('editPaid').value) || 0,
+        discount: parseFloat(document.getElementById('editDiscount').value) || 0,
+        next_appointment: document.getElementById('editNextDate').value || null,
+        next_appointment_time: document.getElementById('editNextTime').value || null
+      };
+
+      try {
+        const res = await fetch(`/patients/${opd}`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if(res.ok) {
+          document.getElementById('updateStatus').innerText = "✅ Record Updated Successfully!";
+          setTimeout(() => { document.getElementById('updateStatus').innerText = ""; }, 3000);
+          loadTreatmentDetails();
+          loadAppointments();
+          loadDailyLogs();
+        } else {
+          alert("Failed to update patient details.");
+        }
+      } catch(e) {
+        alert("Error updating record: " + e.message);
+      }
     }
 
     function generateCanalInputs() {
