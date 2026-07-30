@@ -3,55 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SRA Dental Admin | Full Portal</title>
+  <title>SRA Dental Enterprise Operatory Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #FDFBF7; --card: #FFFFFF; --gold: #A88238; --gold-dark: #8C6D2D; --text: #1C1917; --muted: #78716C; --border: rgba(168, 130, 56, 0.22); }
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; }
+    :root { --bg: #F8FAF9; --card: #FFFFFF; --gold: #9A7B38; --gold-dark: #7A5F26; --accent: #1E293B; --border: #E2E8F0; --soft-bg: #F1F5F9; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #0F172A; margin: 0; padding: 0; }
     
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #fff; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-    .brand-title { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold); margin: 0; font-weight: 700; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 4%; background: #FFF; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .brand-title { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold-dark); margin: 0; font-weight: 700; letter-spacing: 0.5px; }
     
-    .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tab-btn { background: transparent; border: 1px solid var(--border); padding: 8px 14px; border-radius: 4px; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: 0.3s; color: var(--text); }
+    .nav-tabs { display: flex; gap: 8px; }
+    .tab-btn { background: transparent; border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; color: #475569; }
     .tab-btn.active, .tab-btn:hover { background: var(--gold); color: #FFF; border-color: var(--gold); }
     
-    .container { max-width: 1200px; margin: 40px auto; padding: 0 5%; }
+    .container { max-width: 1280px; margin: 25px auto; padding: 0 3%; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     
-    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .metric-card { background: var(--card); padding: 25px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-    .metric-title { font-size: 12px; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
-    .metric-value { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 700; color: var(--gold-dark); margin: 0; }
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 25px; }
+    .metric-card { background: var(--card); padding: 18px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .metric-title { font-size: 10px; text-transform: uppercase; color: #64748B; font-weight: 700; margin-bottom: 6px; }
+    .metric-value { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; color: var(--gold-dark); margin: 0; }
     
-    .card { background: var(--card); padding: 30px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
-    .card h3 { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .card { background: var(--card); padding: 24px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
+    .card h3 { font-family: 'Cinzel', serif; font-size: 17px; color: var(--gold-dark); margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
     
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-    label { font-size: 12px; font-weight: 700; color: var(--gold-dark); text-transform: uppercase; display: block; margin-bottom: 8px; }
-    input, select { width: 100%; padding: 12px; background: #FAF9F6; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    label { font-size: 11px; font-weight: 700; color: #334155; text-transform: uppercase; display: block; margin-bottom: 5px; }
+    input, select, textarea { width: 100%; padding: 9px 12px; background: #FFF; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
     
-    .btn-gold { background: var(--gold); color: #FFF; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+    .btn-gold { background: var(--gold); color: #FFF; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 11px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
     .btn-gold:hover { background: var(--gold-dark); }
+    .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold-dark); }
+    .btn-danger { background: #E11D48; color: #FFF; }
     
     table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid var(--border); }
-    th, td { padding: 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
-    th { background: #F5EFE6; font-family: 'Cinzel', serif; color: var(--gold-dark); font-weight: 700; }
-    tr:hover { background: #FAF9F6; }
+    th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+    th { background: #F8FAFC; font-family: 'Cinzel', serif; color: var(--gold-dark); font-weight: 700; }
     
-    .dynamic-section { background: #FAF9F6; padding: 25px; border-radius: 8px; border: 2px solid var(--border); margin-top: 20px; }
-    .file-upload-box { border: 2px dashed var(--gold); padding: 20px; border-radius: 6px; background: #FFF; text-align: center; }
+    .dynamic-section { background: var(--soft-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-top: 20px; }
+    .file-upload-box { border: 2px dashed var(--gold); padding: 15px; border-radius: 6px; background: #FFF; text-align: center; }
   </style>
 </head>
 <body>
 
   <nav class="navbar">
-    <h2 class="brand-title">SRA DENTAL</h2>
+    <h2 class="brand-title">SRA DENTAL OPERATORY</h2>
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" onclick="switchTab('register')">New Patient</button>
-      <button class="tab-btn" onclick="switchTab('treatment')" style="background:#F5EFE6; color:#8C6D2D; border-color:#8C6D2D;">Treatment Details</button>
+      <button class="tab-btn" onclick="switchTab('treatment')" style="background:#FEF3C7; color:#92400E; border-color:#F59E0B;">Clinical Operatory Chart</button>
       <button class="tab-btn" onclick="switchTab('appointments')">Appointments</button>
       <button class="tab-btn" onclick="switchTab('logs')">Daily Logs</button>
     </div>
@@ -62,59 +63,84 @@
     <!-- 1. DASHBOARD -->
     <div id="dashboard" class="tab-content active">
       <div class="analytics-grid">
-        <div class="metric-card"><div class="metric-title">Daily Income</div><div class="metric-value" id="statDailyInc">₹0</div></div>
-        <div class="metric-card"><div class="metric-title">Total Income</div><div class="metric-value" id="statTotalInc">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Today's Revenue</div><div class="metric-value" id="statTodayRev">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Month's Revenue</div><div class="metric-value" id="statMonthRev">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Total Dues</div><div class="metric-value" id="statTotalDues" style="color:#E11D48;">₹0</div></div>
         <div class="metric-card"><div class="metric-title">Daily OPD</div><div class="metric-value" id="statDailyOpd">0</div></div>
         <div class="metric-card"><div class="metric-title">Total OPD</div><div class="metric-value" id="statTotalOpd">0</div></div>
+        <div class="metric-card"><div class="metric-title">Reel Leads</div><div class="metric-value" id="statReelLeads">0</div></div>
+        <div class="metric-card"><div class="metric-title">Web Leads</div><div class="metric-value" id="statWebLeads">0</div></div>
       </div>
     </div>
 
-    <!-- 2. REGISTER PATIENT -->
+    <!-- 2. REGISTER NEW PATIENT -->
     <div id="register" class="tab-content">
       <div class="card">
-        <h3>Register New Patient</h3>
+        <h3>Patient Consultation & Operatory Registration</h3>
         <div class="form-grid">
-          <div><label>Patient Name</label><input type="text" id="regName" placeholder="Enter Full Name"></div>
-          <div><label>Phone Number</label><input type="text" id="regPhone" placeholder="Enter Phone"></div>
-          <div><label>Select Procedure</label><select id="regProc"></select></div>
+          <div><label>Patient Full Name</label><input type="text" id="regName" placeholder="e.g. Rahul Sharma"></div>
+          <div><label>Phone Number</label><input type="text" id="regPhone" placeholder="e.g. 9876543210"></div>
+          <div><label>Patient Place / City Address</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
+          <div><label>Select Procedure</label><select id="regProc" onchange="updateProcPrice()"></select></div>
           <div><label>Time Slot</label><input type="time" id="regTime" value="10:00"></div>
-          <div><label>Amount Paid Today (₹)</label><input type="number" id="regPaid" value="0"></div>
-          <div><label>Next Appointment (Optional)</label><input type="date" id="regNextDate"></div>
+          <div><label>Operatory Chair Assignment</label>
+            <select id="regChair">
+              <option value="Operatory 1">Operatory 1</option>
+              <option value="Operatory 2">Operatory 2</option>
+              <option value="Surgical Suite">Surgical Suite</option>
+            </select>
+          </div>
+          <div><label>Procedure Price (₹)</label><input type="number" id="regBasePrice" readonly></div>
+          <div><label>Discount Given (₹)</label><input type="number" id="regDiscount" value="0"></div>
+          <div><label>Payment Received (₹)</label><input type="number" id="regPaid" value="0"></div>
+          <div><label>Next Scheduled Appointment</label><input type="date" id="regNextDate"></div>
+          <div><label>Lead / Referral Source</label>
+            <select id="regSource">
+              <option value="Website">Website</option>
+              <option value="Instagram Reel">Instagram Reel</option>
+              <option value="Walk-in">Walk-in</option>
+              <option value="Referral">Referral</option>
+            </select>
+          </div>
+          <div><label>Extracted / Target Tooth (Optional)</label><input type="text" id="regExtractedTooth" placeholder="e.g. 16, 26"></div>
         </div>
-        <button class="btn-gold" style="padding: 15px 30px;" onclick="registerPatient()">Register & Open Treatment</button>
-        <div id="regStatus" style="margin-top: 15px; font-weight: bold; color: green;"></div>
+        <button class="btn-gold" style="padding: 12px 25px; margin-top: 20px;" onclick="registerPatient()">Register Patient & Launch Operatory Chart</button>
+        <div id="regStatus" style="margin-top: 15px; font-weight: bold; color: #16A34A;"></div>
       </div>
     </div>
 
-    <!-- 3. TREATMENT DETAILS -->
+    <!-- 3. CLINICAL OPERATORY & HAND-TYPED ENDO CHARTING -->
     <div id="treatment" class="tab-content">
       <div class="card">
-        <h3>Treatment & Endodontic Charting</h3>
+        <h3>Enterprise Operatory & Hand-Typed Endo Charting</h3>
         
-        <div class="form-grid" style="align-items: end; border-bottom: 2px solid var(--border); padding-bottom: 20px;">
+        <div class="form-grid" style="align-items: end; border-bottom: 2px solid var(--border); padding-bottom: 15px;">
           <div><label>Enter Patient OPD Number</label><input type="text" id="treatOpd" placeholder="e.g. OPD-101"></div>
-          <div><button class="btn-gold" onclick="loadTreatmentDetails()">Load Patient Data</button></div>
+          <div><button class="btn-gold" onclick="loadTreatmentDetails()">Fetch Patient Chart</button></div>
         </div>
 
         <div id="dynamicTreatmentArea" style="display: none; margin-top: 20px;">
-          <h4 id="treatPatientInfo" style="font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold-dark); margin-bottom: 15px;"></h4>
+          <h4 id="treatPatientInfo" style="font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-dark); margin-bottom: 15px;"></h4>
 
           <div class="dynamic-section">
-            <h3 style="margin-top: 0; color: var(--gold-dark); border-bottom: none;">🦷 Tooth & Canal Charting</h3>
+            <h3 style="margin-top: 0; color: var(--gold-dark); border-bottom: none;">🦷 Tooth & Canal Operatory Charting</h3>
             
             <div class="form-grid">
               <div>
-                <label>Select Teeth Number</label>
-                <!-- This dropdown is populated by Javascript at the bottom of the page to include all Adult and Primary teeth -->
+                <label>Select Tooth System & Number</label>
                 <select id="endoToothNum" onchange="generateCanalInputs()"></select>
               </div>
             </div>
 
-            <!-- CANALS, LENGTH OPTION, BMP OPTION TABLE -->
+            <!-- DYNAMIC HAND-TYPED CANAL TABLE -->
             <div id="canalTableContainer" style="margin-top: 20px;"></div>
-            <button class="btn-gold" style="background: #15803D; margin-top: 15px;" onclick="saveEndoData()">Save Teeth Data</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+              <button class="btn-gold btn-outline" type="button" onclick="addCustomCanalRow()">+ Add Custom Canal Row</button>
+              <button class="btn-gold" style="background: #15803D;" type="button" onclick="saveEndoData()">Save Operatory Charting Data</button>
+            </div>
 
-            <h4 style="margin-top: 30px; font-family: 'Cinzel', serif; color: var(--gold-dark);">📁 Upload Patient Files</h4>
+            <h4 style="margin-top: 25px; font-family: 'Cinzel', serif; color: var(--gold-dark);">📁 Operatory File Attachments</h4>
             <div class="form-grid">
               <div class="file-upload-box">
                 <label>Upload X-Ray File</label>
@@ -127,7 +153,7 @@
                 <button class="btn-gold" onclick="uploadTreatmentFile('BMP')">Upload BMP File</button>
               </div>
             </div>
-            <p id="fileUploadStatus" style="font-weight:bold; color:green; margin-top:15px; text-align:center;"></p>
+            <p id="fileUploadStatus" style="font-weight:bold; color:#16A34A; margin-top:15px; text-align:center;"></p>
           </div>
         </div>
       </div>
@@ -136,16 +162,16 @@
     <!-- 4. APPOINTMENTS -->
     <div id="appointments" class="tab-content">
       <div class="card">
-        <h3>Today's Appointments</h3>
+        <h3>Today's Scheduled Operatory Appointments</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Phone</th><th>Procedure</th><th>Time</th><th>Dues</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Phone</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th><th>Dues</th></tr></thead>
           <tbody id="todayApptTable"></tbody>
         </table>
       </div>
       <div class="card">
-        <h3>Future Appointments</h3>
+        <h3>Future Scheduled Appointments</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Procedure</th><th>Time</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th></tr></thead>
           <tbody id="futureApptTable"></tbody>
         </table>
       </div>
@@ -154,9 +180,10 @@
     <!-- 5. DAILY LOGS -->
     <div id="logs" class="tab-content">
       <div class="card">
-        <h3>Daily Patient Logs</h3>
+        <h3>Daily Patient Operatory Logs & Financial Ledger</h3>
+        <input type="text" id="logSearch" placeholder="Search by Patient Name or OPD..." onkeyup="loadDailyLogs()" style="margin-bottom: 15px; width: 320px;">
         <table>
-          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Procedure</th><th>Total Amt</th><th>Paid</th><th>Due</th><th>Action</th></tr></thead>
+          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Location</th><th>Procedure</th><th>Sitting</th><th>Chair</th><th>Total</th><th>Paid</th><th>Due</th><th>Source</th><th>Action</th></tr></thead>
           <tbody id="logsTable"></tbody>
         </table>
       </div>
@@ -165,6 +192,8 @@
   </div>
 
   <script>
+    let proceduresCache = [];
+
     window.onload = function() { 
       loadDashboard(); 
       loadProcedures(); 
@@ -177,103 +206,112 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
+      
+      const btns = document.querySelectorAll('.tab-btn');
+      btns.forEach(b => { if(b.getAttribute('onclick').includes(tabId)) b.classList.add('active'); });
+
       if(tabId === 'dashboard') loadDashboard();
       if(tabId === 'appointments') loadAppointments();
       if(tabId === 'logs') loadDailyLogs();
     }
 
-    // --- DASHBOARD DATA ---
     async function loadDashboard() {
       try {
         const res = await fetch('/analytics');
         const data = await res.json();
-        document.getElementById('statDailyInc').innerText = `₹${data.daily_income}`;
-        document.getElementById('statTotalInc').innerText = `₹${data.total_income}`;
-        document.getElementById('statDailyOpd').innerText = data.daily_opd;
+        document.getElementById('statTodayRev').innerText = `₹${data.today_revenue}`;
+        document.getElementById('statMonthRev').innerText = `₹${data.month_revenue}`;
+        document.getElementById('statTotalDues').innerText = `₹${data.total_dues}`;
+        document.getElementById('statDailyOpd').innerText = data.today_opd;
         document.getElementById('statTotalOpd').innerText = data.total_opd;
-      } catch (e) { console.error("Error loading dashboard"); }
+        document.getElementById('statReelLeads').innerText = data.reel_leads;
+        document.getElementById('statWebLeads').innerText = data.web_leads;
+      } catch (e) { console.error("Error loading analytics"); }
     }
 
     async function loadProcedures() {
-      const res = await fetch('/procedures');
-      const data = await res.json();
-      const select = document.getElementById('regProc');
-      data.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+      try {
+        const res = await fetch('/procedures');
+        proceduresCache = await res.json();
+        const select = document.getElementById('regProc');
+        select.innerHTML = '<option value="">-- Choose Procedure --</option>';
+        proceduresCache.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price})</option>`);
+      } catch (e) { console.error("Error loading procedures"); }
+    }
+
+    function updateProcPrice() {
+      const id = parseInt(document.getElementById('regProc').value);
+      const proc = proceduresCache.find(p => p.id === id);
+      document.getElementById('regBasePrice').value = proc ? proc.price : 0;
     }
 
     async function registerPatient() {
       const payload = {
         patient_name: document.getElementById('regName').value,
         phone_number: document.getElementById('regPhone').value,
+        patient_place: document.getElementById('regPlace').value || "Mandi Dabwali",
         procedure_id: parseInt(document.getElementById('regProc').value) || 1,
         time_slot: document.getElementById('regTime').value,
         payment_done: parseFloat(document.getElementById('regPaid').value) || 0,
-        next_appointment: document.getElementById('regNextDate').value || null
+        discount: parseFloat(document.getElementById('regDiscount').value) || 0,
+        next_appointment: document.getElementById('regNextDate').value || null,
+        source: document.getElementById('regSource').value,
+        extracted_tooth: document.getElementById('regExtractedTooth').value || null,
+        operatory_chair: document.getElementById('regChair').value
       };
-      
+
       try {
         const res = await fetch('/patients', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
         const data = await res.json();
+        document.getElementById('regStatus').innerText = `✅ Patient Registered! OPD: ${data.opd_number}`;
         
-        document.getElementById('regStatus').innerText = `✅ OPD Generated: ${data.opd_number}`;
         setTimeout(() => {
           document.getElementById('treatOpd').value = data.opd_number;
           switchTab('treatment');
-          // Update visual active button state
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-btn')[2].classList.add('active'); 
           loadTreatmentDetails();
-        }, 1000);
-      } catch (e) { alert("Registration failed."); }
+        }, 1200);
+      } catch (e) { alert("Failed to register patient."); }
     }
 
-    // --- TEETH DROPDOWN GENERATOR ---
     function populateTeethDropdown() {
       const select = document.getElementById('endoToothNum');
       select.innerHTML = '<option value="">-- Select Tooth Number --</option>';
       
-      // Adult Dentition
       const adultGroups = [ 
         {label: 'Upper Right (11 to 18)', start:11, end:18}, {label: 'Upper Left (21 to 28)', start:21, end:28}, 
         {label: 'Lower Left (31 to 38)', start:31, end:38}, {label: 'Lower Right (41 to 48)', start:41, end:48} 
       ];
       adultGroups.forEach(g => {
-        let group = document.createElement('optgroup'); group.label = `Adult ${g.label}`;
+        let group = document.createElement('optgroup'); group.label = `Adult Dentition: ${g.label}`;
         for(let i=g.start; i<=g.end; i++) group.innerHTML += `<option value="${i}">Tooth ${i}</option>`;
         select.appendChild(group);
       });
 
-      // Primary Dentition (Pedo)
       const primaryGroups = [ 
-        {label: 'Upper Right (5A to 5E)', start:51, end:55, pfx:5}, {label: 'Upper Left (6A to 6E)', start:61, end:65, pfx:6}, 
-        {label: 'Lower Left (7A to 7E)', start:71, end:75, pfx:7}, {label: 'Lower Right (8A to 8E)', start:81, end:85, pfx:8} 
+        {label: 'Upper Right (51 to 55)', start:51, end:55}, {label: 'Upper Left (61 to 65)', start:61, end:65}, 
+        {label: 'Lower Left (71 to 75)', start:71, end:75}, {label: 'Lower Right (81 to 85)', start:81, end:85} 
       ];
-      const letters = ['A','B','C','D','E'];
       primaryGroups.forEach(g => {
-        let group = document.createElement('optgroup'); group.label = `Primary ${g.label}`;
-        for(let i=g.start; i<=g.end; i++) {
-            let letter = letters[i - (g.pfx*10) - 1];
-            group.innerHTML += `<option value="${i}">Tooth ${i} (Primary ${g.pfx}${letter})</option>`;
-        }
+        let group = document.createElement('optgroup'); group.label = `Primary Dentition: ${g.label}`;
+        for(let i=g.start; i<=g.end; i++) group.innerHTML += `<option value="${i}">Tooth ${i}</option>`;
         select.appendChild(group);
       });
     }
 
-    // --- TREATMENT DETAILS ---
     async function loadTreatmentDetails() {
       const opd = document.getElementById('treatOpd').value;
-      if(!opd) return;
+      if(!opd) { alert("Please enter an OPD number!"); return; }
+
       try {
         const res = await fetch(`/patients/${opd}`);
-        if(!res.ok) { alert("Patient not found!"); return; }
+        if(!res.ok) { alert("Patient record not found!"); return; }
         const patient = await res.json();
         document.getElementById('dynamicTreatmentArea').style.display = 'block';
-        document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} (OPD: ${patient.opd_number}) | Procedure: ${patient.procedure_name}`;
-        document.getElementById('fileUploadStatus').innerText = ""; 
-      } catch (e) { alert("Error connecting."); }
+        document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} (${patient.patient_place}) | OPD: ${patient.opd_number} | Chair: ${patient.operatory_chair} | Procedure: ${patient.procedure_name}`;
+      } catch (e) { alert("Error connecting to server."); }
     }
 
+    // --- DYNAMIC HAND-TYPED CANAL CHARTING ---
     function generateCanalInputs() {
       const tooth = document.getElementById('endoToothNum').value;
       const container = document.getElementById('canalTableContainer');
@@ -286,61 +324,127 @@
           if (tooth.endsWith('6') || tooth.endsWith('7') || tooth.endsWith('8') || tooth.endsWith('4') || tooth.endsWith('5')) canals = ["MB", "ML", "Distal"];
       }
 
-      let html = `<table><thead><tr><th>Canal Name</th><th>Length Option (mm)</th><th>BMP Option (mm)</th></tr></thead><tbody>`;
-      canals.forEach((c, idx) => {
-        html += `<tr><td><b>${c}</b></td>
-        <td><input type="number" step="0.5" id="len_${idx}" placeholder="e.g. 21"></td>
-        <td><input type="number" step="0.5" id="bmp_${idx}" placeholder="e.g. 25"></td></tr>`;
+      let html = `<table>
+        <thead>
+          <tr>
+            <th>Canal Name (Hand-Typed)</th>
+            <th>Working Length (mm)</th>
+            <th>BMP Size / Option</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="canalRowsBody">`;
+
+      canals.forEach((c) => {
+        html += `<tr>
+          <td><input type="text" class="canal-name" value="${c}" placeholder="e.g. MB1"></td>
+          <td><input type="text" class="canal-length" placeholder="e.g. 21.5 mm"></td>
+          <td><input type="text" class="canal-bmp" placeholder="e.g. #25 / .04"></td>
+          <td><button class="btn-gold btn-danger" style="padding:4px 8px; font-size:10px;" onclick="this.closest('tr').remove()">Remove</button></td>
+        </tr>`;
       });
       html += `</tbody></table>`;
       container.innerHTML = html;
-      container.dataset.canals = JSON.stringify(canals);
+    }
+
+    function addCustomCanalRow() {
+      const tbody = document.getElementById('canalRowsBody');
+      if(!tbody) { alert("Please select a Tooth Number first!"); return; }
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="canal-name" placeholder="Type canal name..."></td>
+        <td><input type="text" class="canal-length" placeholder="Type working length (mm)..."></td>
+        <td><input type="text" class="canal-bmp" placeholder="Type BMP size/option..."></td>
+        <td><button class="btn-gold btn-danger" style="padding:4px 8px; font-size:10px;" onclick="this.closest('tr').remove()">Remove</button></td>
+      `;
+      tbody.appendChild(tr);
     }
 
     async function saveEndoData() {
       const opd = document.getElementById('treatOpd').value;
       const tooth = document.getElementById('endoToothNum').value;
-      if(!tooth) { alert("Select a Teeth Number!"); return; }
-      const canals = JSON.parse(document.getElementById('canalTableContainer').dataset.canals || "[]");
+      if(!tooth) { alert("Select a Tooth Number!"); return; }
+
+      const rows = document.querySelectorAll('#canalRowsBody tr');
       let dataToSave = [];
-      canals.forEach((c, idx) => { dataToSave.push({ canal: c, length_option: document.getElementById(`len_${idx}`).value, bmp_option: document.getElementById(`bmp_${idx}`).value }); });
-      await fetch('/patients/endo-chart', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ opd_number: opd, tooth_number: tooth, canals_data: JSON.stringify(dataToSave) }) });
-      alert("✅ Saved Successfully!");
+
+      rows.forEach(row => {
+        dataToSave.push({
+          canal: row.querySelector('.canal-name').value,
+          length_option: row.querySelector('.canal-length').value,
+          bmp_option: row.querySelector('.canal-bmp').value
+        });
+      });
+
+      const payload = { opd_number: opd, tooth_number: tooth, canals_data: JSON.stringify(dataToSave) };
+      try {
+        await fetch('/patients/endo-chart', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        alert("✅ Operatory Tooth Charting Data Saved!");
+      } catch (e) { alert("Failed to save tooth charting data."); }
     }
 
     async function uploadTreatmentFile(fileType) {
       const opd = document.getElementById('treatOpd').value;
       const tooth = document.getElementById('endoToothNum').value;
-      if(!tooth) { alert("Select a Teeth Number first!"); return; }
+      if(!tooth) { alert("Please select a Tooth Number first!"); return; }
+
       const fileInput = fileType === 'BMP' ? document.getElementById('fileBmp') : document.getElementById('fileXray');
-      if(fileInput.files.length === 0) { alert(`Select a ${fileType} file!`); return; }
-      const formData = new FormData(); formData.append("file_type", fileType); formData.append("tooth_number", tooth); formData.append("file", fileInput.files[0]);
-      const res = await fetch(`/patients/${opd}/upload-treatment-file`, { method: 'POST', body: formData });
-      if(res.ok) { document.getElementById('fileUploadStatus').innerText = `✅ ${fileType} File Uploaded!`; fileInput.value = ""; }
+      if(fileInput.files.length === 0) { alert(`Select a ${fileType} file to upload!`); return; }
+
+      const formData = new FormData();
+      formData.append("file_type", fileType);
+      formData.append("tooth_number", tooth);
+      formData.append("file", fileInput.files[0]);
+
+      try {
+        const res = await fetch(`/patients/${opd}/upload-treatment-file`, { method: 'POST', body: formData });
+        if(res.ok) {
+          document.getElementById('fileUploadStatus').innerText = `✅ ${fileType} File Uploaded for Tooth ${tooth}!`;
+          fileInput.value = "";
+        }
+      } catch (e) { alert("File upload failed."); }
     }
 
-    // --- LOGS & APPOINTMENTS ---
     async function loadAppointments() {
-      const res = await fetch('/views/appointments');
-      const data = await res.json();
-      
-      let tHtml = ''; data.today.forEach(i => tHtml += `<tr><td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.phone}</td><td>${i.procedure}</td><td>${i.time_slot}</td><td style="color:red">₹${i.pending_payment}</td></tr>`);
-      document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="6">No appointments today</td></tr>';
-      
-      let fHtml = ''; data.future.forEach(i => fHtml += `<tr><td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${i.procedure}</td><td>${i.time_slot}</td></tr>`);
-      document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="5">No future appointments</td></tr>';
+      try {
+        const res = await fetch('/views/appointments');
+        const data = await res.json();
+
+        let tHtml = '';
+        data.today.forEach(i => tHtml += `<tr>
+          <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.phone}</td><td>${i.patient_place}</td>
+          <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td><td style="color:red; font-weight:bold;">₹${i.pending_payment}</td>
+        </tr>`);
+        document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="8">No appointments today</td></tr>';
+
+        let fHtml = '';
+        data.future.forEach(i => fHtml += `<tr>
+          <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${i.patient_place}</td>
+          <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td>
+        </tr>`);
+        document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="7">No future appointments scheduled</td></tr>';
+      } catch (e) { console.error("Error loading appointments"); }
     }
 
     async function loadDailyLogs() {
-      const res = await fetch('/views/daily-log');
-      const data = await res.json();
-      let html = '';
-      data.forEach(p => {
-        html += `<tr><td>${p.date}</td><td><b>${p.opd_number}</b></td><td>${p.patient_name}</td><td>${p.procedure}</td>
-          <td>₹${p.total_amount}</td><td style="color:green;font-weight:bold;">₹${p.total_paid}</td><td style="color:red">₹${p.payment_left}</td>
-          <td><button class="btn-gold" style="padding:6px 12px; font-size:10px;" onclick="document.getElementById('treatOpd').value='${p.opd_number}'; switchTab('treatment'); loadTreatmentDetails();">Details</button></td></tr>`;
-      });
-      document.getElementById('logsTable').innerHTML = html;
+      try {
+        const query = document.getElementById('logSearch')?.value || '';
+        const res = await fetch(`/views/daily-log${query ? '?search=' + encodeURIComponent(query) : ''}`);
+        const data = await res.json();
+
+        let html = '';
+        data.forEach(p => {
+          html += `<tr>
+            <td>${p.date}</td><td><b>${p.opd_number}</b></td><td>${p.patient_name}</td><td>${p.patient_place}</td>
+            <td>${p.procedure}</td><td>Sitting ${p.current_sitting}/${p.total_sittings}</td><td>${p.chair}</td>
+            <td>₹${p.total_amount}</td><td style="color:green;font-weight:bold;">₹${p.total_paid}</td>
+            <td style="color:red;font-weight:bold;">₹${p.payment_left}</td><td>${p.source}</td>
+            <td><button class="btn-gold" style="padding:4px 8px; font-size:10px;" onclick="document.getElementById('treatOpd').value='${p.opd_number}'; switchTab('treatment'); loadTreatmentDetails();">Operatory Chart</button></td>
+          </tr>`;
+        });
+        document.getElementById('logsTable').innerHTML = html || '<tr><td colspan="12">No patient logs found</td></tr>';
+      } catch (e) { console.error("Error loading daily logs"); }
     }
   </script>
 </body>
