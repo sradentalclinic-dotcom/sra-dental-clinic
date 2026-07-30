@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SRA Dental Clinical Suite</title>
+  <title>AURA Dental Clinical Suite</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -21,7 +21,7 @@
         <div class="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center font-bold text-slate-900 text-xl shadow-lg shadow-teal-500/20">
           A
         </div>
-        <span class="text-xl font-extrabold tracking-tight text-white">SRA<span class="text-teal-400">DENTAL</span></span>
+        <span class="text-xl font-extrabold tracking-tight text-white">AURA<span class="text-teal-400">DENTAL</span></span>
       </div>
       <nav class="flex space-x-1 sm:space-x-2">
         <button onclick="switchTab('dashboard')" class="tab-btn active bg-teal-500 text-slate-900 px-3.5 py-2 rounded-xl text-xs font-bold transition-all">Dashboard</button>
@@ -75,15 +75,16 @@
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Age</label><input type="number" id="regAge" placeholder="e.g. 32" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Phone Number *</label><input type="text" id="regPhone" placeholder="9876543210" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Place / Location</label><input type="text" id="regPlace" value="Mandi Dabwali" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
-          <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Procedure (23 Included) *</label><select id="regProc" onchange="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></select></div>
+          <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Procedure *</label><select id="regProc" onchange="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></select></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Units / Teeth Count *</label><input type="number" id="regUnits" value="1" min="1" oninput="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Unit Rate (₹)</label><input type="number" id="regBasePrice" readonly class="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Discount (₹)</label><input type="number" id="regDiscount" value="0" oninput="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Payment Received (₹)</label><input type="number" id="regPaid" value="0" oninput="updateRegisterCalculations()" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"></div>
           <div><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Operatory Chair</label>
             <select id="regChair" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
-              <option value="Operatory 1">Operatory 1</option>
-              <option value="Operatory 2">Operatory 2</option>
+              <option value="Op-01">Op-01</option>
+              <option value="Op-02">Op-02</option>
+              <option value="Op-03">Op-03</option>
               <option value="Surgical Suite">Surgical Suite</option>
             </select>
           </div>
@@ -104,18 +105,29 @@
       </div>
     </div>
 
-    <!-- TAB 3: TREATMENT OPERATORY CHART -->
+    <!-- TAB 3: TREATMENT OPERATORY CHART & XML IMPORT -->
     <div id="treatment" class="tab-content">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-5xl mx-auto mb-8">
+        <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4">Clinical XML EHR Import Suite</h2>
+        <p class="text-xs text-slate-500 mb-4">Paste your clinic's XML export to instantly populate patient records, canal working lengths, surgical extractions, and DICOM attachments.</p>
+        <textarea id="xmlImportInput" rows="5" class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono mb-4 focus:ring-2 focus:ring-teal-500 focus:outline-none" placeholder="Paste DentalEHR_Export XML here..."></textarea>
+        <button onclick="importEHRXML()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all">Import & Parse EHR XML</button>
+        <p id="xmlImportStatus" class="mt-2 text-xs font-bold text-teal-600"></p>
+      </div>
+
       <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-5xl mx-auto">
         <h2 class="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4 mb-6">Clinical Chart & Patient Management</h2>
         
         <div class="flex gap-4 items-end mb-6">
-          <div class="flex-1"><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Enter Patient OPD Number</label><input type="text" id="treatOpd" placeholder="e.g. OPD-101" class="w-full p-3 rounded-xl border border-slate-200 text-sm"></div>
+          <div class="flex-1"><label class="block text-xs font-bold uppercase text-slate-500 mb-2">Enter Patient OPD Number</label><input type="text" id="treatOpd" placeholder="e.g. OPD-904281" class="w-full p-3 rounded-xl border border-slate-200 text-sm"></div>
           <button onclick="loadTreatmentDetails()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all">Fetch Patient Record</button>
         </div>
 
         <div id="dynamicTreatmentArea" class="hidden">
           <div class="p-4 rounded-xl bg-slate-100 text-slate-800 font-bold text-sm mb-6" id="treatPatientInfo"></div>
+
+          <!-- Advanced Clinical Records Viewer -->
+          <div id="clinicalRecordsViewer" class="mb-6 space-y-6"></div>
 
           <!-- Edit Section -->
           <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 mb-6">
@@ -128,8 +140,6 @@
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Units / Quantity</label><input type="number" id="editUnits" min="1" oninput="updateEditCalculations()" class="w-full p-2.5 rounded-lg border text-sm"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Discount Allowed (₹)</label><input type="number" id="editDiscount" oninput="updateEditCalculations()" class="w-full p-2.5 rounded-lg border text-sm"></div>
               <div><label class="block text-xs font-bold text-slate-500 mb-1">Total Paid (₹)</label><input type="number" id="editPaid" oninput="updateEditCalculations()" class="w-full p-2.5 rounded-lg border text-sm"></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Next Appt Date</label><input type="date" id="editNextDate" class="w-full p-2.5 rounded-lg border text-sm"></div>
-              <div><label class="block text-xs font-bold text-slate-500 mb-1">Next Appt Time</label><input type="time" id="editNextTime" class="w-full p-2.5 rounded-lg border text-sm"></div>
             </div>
 
             <div class="mt-4 p-3 rounded-lg bg-white border border-slate-200 flex justify-between items-center">
@@ -262,7 +272,6 @@
       const proc = proceduresCache.find(p => p.id === procId);
       const basePrice = proc ? proc.price : 0;
       document.getElementById('regBasePrice').value = basePrice;
-
       const units = parseInt(document.getElementById('regUnits').value) || 1;
       const discount = parseFloat(document.getElementById('regDiscount').value) || 0;
       const total = Math.max(0, (basePrice * units) - discount);
@@ -309,15 +318,34 @@
       setTimeout(() => { document.getElementById('treatOpd').value = data.opd_number; switchTab('treatment'); loadTreatmentDetails(); }, 1000);
     }
 
+    async function importEHRXML() {
+      const xmlText = document.getElementById('xmlImportInput').value.trim();
+      if (!xmlText) { alert("Please paste XML EHR export data."); return; }
+
+      const res = await fetch('/patients/import-xml', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ xml_data: xmlText })
+      });
+      const data = await res.json();
+      if(res.ok) {
+        document.getElementById('xmlImportStatus').innerText = `Imported Successfully! OPD: ${data.opd_number}`;
+        document.getElementById('treatOpd').value = data.opd_number;
+        loadTreatmentDetails();
+      } else {
+        alert("Import failed: " + data.detail);
+      }
+    }
+
     async function loadTreatmentDetails() {
-      const opd = document.getElementById('treatOpd').value;
+      const opd = document.getElementById('treatOpd').value.trim();
       if(!opd) return;
       const res = await fetch(`/patients/${opd}`);
       if(!res.ok) { alert("Patient not found!"); return; }
       const patient = await res.json();
       
       document.getElementById('dynamicTreatmentArea').classList.remove('hidden');
-      document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} | OPD: ${patient.opd_number} | Procedure: ${patient.procedure_name} (${patient.units} Units)`;
+      document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} | OPD: ${patient.opd_number} | Procedure: ${patient.procedure_name} (${patient.units} Units) | Chair: ${patient.operatory_chair}`;
 
       document.getElementById('editName').value = patient.patient_name;
       document.getElementById('editName').setAttribute('data-baseprice', patient.base_price);
@@ -328,6 +356,52 @@
       document.getElementById('editPaid').value = patient.total_paid;
       document.getElementById('editDiscount').value = patient.discount;
       updateEditCalculations();
+
+      // Load Clinical Records (Extractions, Endos, Attachments)
+      const clinicalRes = await fetch(`/patients/${opd}/clinical-records`);
+      const clinical = await clinicalRes.json();
+      
+      let viewerHtml = '';
+      
+      if(clinical.extractions.length > 0) {
+        viewerHtml += `<div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+          <h4 class="font-bold text-rose-900 text-xs uppercase mb-2">Surgical Extractions Record</h4>`;
+        clinical.extractions.forEach(ex => {
+          viewerHtml += `<p class="text-xs text-rose-800">Tooth #${ex.tooth_universal} (FDI ${ex.fdi}) - ${ex.tooth_name}: <b>${ex.description}</b> | Anesthesia: ${ex.anesthesia} | Status: ${ex.status}</p>`;
+        });
+        viewerHtml += `</div>`;
+      }
+
+      if(clinical.endodontics.length > 0) {
+        viewerHtml += `<div class="p-4 rounded-xl bg-teal-50 border border-teal-200">
+          <h4 class="font-bold text-teal-900 text-xs uppercase mb-2">Endodontic (RCT) Record & Canal Chart</h4>`;
+        clinical.endodontics.forEach(endo => {
+          viewerHtml += `<div class="mb-3">
+            <p class="text-xs text-teal-900 font-bold">Tooth #${endo.tooth_universal} (FDI ${endo.fdi}) - ${endo.tooth_name}</p>
+            <p class="text-xs text-teal-700">System: ${endo.system_used} | Irrigants: ${endo.irrigants} | MAF: ${endo.master_apical_file} | Obturation: ${endo.obturation}</p>
+            <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">`;
+          endo.canals.forEach(c => {
+            viewerHtml += `<div class="p-2 rounded bg-white border border-teal-100 text-xs">
+              <span class="font-bold text-slate-800">${c.name}</span><br>
+              WL: <span class="text-teal-600 font-bold">${c.wl} mm</span> (${c.ref_point})<br>
+              Master File: ${c.master_file}
+            </div>`;
+          });
+          viewerHtml += `</div></div>`;
+        });
+        viewerHtml += `</div>`;
+      }
+
+      if(clinical.attachments.length > 0) {
+        viewerHtml += `<div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
+          <h4 class="font-bold text-blue-900 text-xs uppercase mb-2">Diagnostic DICOM Attachments</h4>`;
+        clinical.attachments.forEach(att => {
+          viewerHtml += `<p class="text-xs text-blue-800 mb-1">📄 <b>${att.label}</b> [<a href="${att.url}" target="_blank" class="underline text-blue-600 font-bold">Secure DICOM Link</a>] - Status: ${att.status}</p>`;
+        });
+        viewerHtml += `</div>`;
+      }
+
+      document.getElementById('clinicalRecordsViewer').innerHTML = viewerHtml;
     }
 
     async function updatePatientDetails() {
