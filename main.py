@@ -1,8 +1,8 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Optional
 import os
 import json
-from fastapi import FastAPI, HTTPException, Query, Depends, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,7 +11,6 @@ from sqlalchemy import Column, Date, Float, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
-# Database Setup
 DATABASE_URL = "sqlite:///./sra_dental.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -43,7 +42,7 @@ class PatientModel(Base):
     payment_left = Column(Float)
     time_slot = Column(String)
     next_appointment = Column(Date, nullable=True)
-    next_appointment_time = Column(String, nullable=True)  # ADDED NEXT APPOINTMENT TIME
+    next_appointment_time = Column(String, nullable=True)
     created_date = Column(Date, default=date.today)
     source = Column(String, default="Website")
     xray_path = Column(String, nullable=True)
@@ -56,7 +55,7 @@ class EndoChartModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     opd_number = Column(String, index=True)
     tooth_number = Column(String)
-    canals_data = Column(Text)  # Stores JSON array of hand-typed canal entries
+    canals_data = Column(Text)
 
 Base.metadata.create_all(bind=engine)
 
@@ -132,11 +131,11 @@ class PatientCreate(BaseModel):
     phone_number: str
     patient_place: Optional[str] = "Mandi Dabwali"
     procedure_id: int
-    time_slot: str
-    payment_done: float
+    time_slot: Optional[str] = "10:00"
+    payment_done: float = 0.0
     discount: float = 0.0
     next_appointment: Optional[str] = None
-    next_appointment_time: Optional[str] = None  # ADDED FIELD
+    next_appointment_time: Optional[str] = None
     source: str = "Website"
     extracted_tooth: Optional[str] = None
     operatory_chair: Optional[str] = "Operatory 1"
@@ -150,13 +149,20 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     base_amt = proc.price if proc else 0.0
     total_amt = max(0.0, base_amt - data.discount)
     payment_left = max(0.0, total_amt - data.payment_done)
-    next_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
+
+    # Safe Date Parsing
+    next_date = None
+    if data.next_appointment and data.next_appointment.strip():
+        try:
+            next_date = datetime.strptime(data.next_appointment.strip(), "%Y-%m-%d").date()
+        except ValueError:
+            next_date = None
 
     new_patient = PatientModel(
         opd_number=opd_number,
         patient_name=data.patient_name,
         phone_number=data.phone_number,
-        patient_place=data.patient_place,
+        patient_place=data.patient_place or "Mandi Dabwali",
         procedure_id=data.procedure_id,
         total_sittings=proc.total_sittings if proc else 1,
         base_price=base_amt,
@@ -164,7 +170,7 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
         total_amount=total_amt,
         total_paid=data.payment_done,
         payment_left=payment_left,
-        time_slot=data.time_slot,
+        time_slot=data.time_slot or "10:00",
         next_appointment=next_date,
         next_appointment_time=data.next_appointment_time,
         source=data.source,
@@ -174,6 +180,7 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
     )
     db.add(new_patient)
     db.commit()
+    db.refresh(new_patient)
     return {"message": "Patient registered successfully", "opd_number": opd_number}
 
 @app.get("/patients/{opd_number}")
