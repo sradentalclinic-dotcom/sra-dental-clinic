@@ -75,7 +75,7 @@ class LabWorkModel(Base):
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="SRA Dental Enterprise Operatory Suite")
+app = FastAPI(title="SRA Dental Modern Operatory Suite")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -95,28 +95,46 @@ def get_db():
 
 @app.get("/")
 def serve_patient_portal():
-    return FileResponse("patient.html")
+    return FileResponse("index.html")
 
 @app.get("/admin")
 def serve_admin_portal():
     return FileResponse("index.html")
 
+# FULL UPDATED PRICE LIST LOADED INTO DATABASE
 @app.get("/procedures")
 def get_procedures(db: Session = Depends(get_db)):
     procs = db.query(ProcedureModel).all()
+    
+    # Updated Price List Sync
+    price_list = [
+        ("RCT ANTERIOR", 2000, 3, 3),
+        ("RCT POSTERIOR", 2500, 3, 3),
+        ("RCT PEDO", 2000, 3, 2),
+        ("CONSULTATION", 100, 0, 1),
+        ("TEMPORARY FILLING", 100, 0, 1),
+        ("GIC FILLING", 500, 0, 1),
+        ("COMPOSITE FILLING", 1000, 0, 1),
+        ("EXTRACTION", 500, 2, 1),
+        ("SURGICAL EXTRACTION", 3000, 3, 2),
+        ("SCALING", 1000, 0, 1),
+        ("METAL CROWN", 1500, 3, 2),
+        ("PFM CROWN", 2000, 3, 2),
+        ("PREMIUM PFM CROWN", 2500, 3, 2),
+        ("DMLS CROWN", 3000, 3, 2),
+        ("ZIRCONIA CROWN 2", 4000, 3, 2),
+        ("ZIRCONIA 5", 5000, 3, 2),
+        ("ZIRCONIA 10", 6000, 3, 2),
+        ("COMPLETE DENTURE", 10000, 5, 3),
+        ("RPD", 500, 3, 2),
+        ("VENEER", 5000, 3, 2),
+        ("LOCAL IMPLANT", 15000, 7, 3),
+        ("KOREAN IMPLANT", 25000, 7, 3),
+        ("PREMIUM DENTURE", 20000, 5, 3)
+    ]
+
     if not procs:
-        defaults = [
-            ProcedureModel(name="RCT ANTERIOR", price=2000, gap_days=3, total_sittings=3),
-            ProcedureModel(name="RCT POSTERIOR", price=2500, gap_days=3, total_sittings=3),
-            ProcedureModel(name="CONSULTATION", price=100, gap_days=0, total_sittings=1),
-            ProcedureModel(name="EXTRACTION", price=500, gap_days=2, total_sittings=2),
-            ProcedureModel(name="SCALING", price=1000, gap_days=0, total_sittings=1),
-            ProcedureModel(name="PFM CROWN", price=2000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="ZIRCONIA CROWN", price=4000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="FULL DENTURE", price=8000, gap_days=5, total_sittings=3),
-            ProcedureModel(name="METAL CAP", price=1000, gap_days=3, total_sittings=2),
-            ProcedureModel(name="RPD", price=500, gap_days=3, total_sittings=2)
-        ]
+        defaults = [ProcedureModel(name=item[0], price=item[1], gap_days=item[2], total_sittings=item[3]) for item in price_list]
         db.add_all(defaults)
         db.commit()
         procs = db.query(ProcedureModel).all()
@@ -247,7 +265,7 @@ def update_patient(opd_number: str, data: PatientUpdate, db: Session = Depends(g
     if data.discount is not None: patient.discount = data.discount
     if data.payment_done is not None: patient.total_paid = data.payment_done
     
-    # Auto Recalculate
+    # Recalculate billing automatically
     patient.total_amount = max(0.0, (patient.base_price * patient.units) - patient.discount)
     patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
 
@@ -307,7 +325,7 @@ def get_patient_details(opd_number: str, db: Session = Depends(get_db)):
         "charts": saved_charts
     }
 
-# LAB WORK BILLING ENDPOINTS
+# LAB WORK RATES & BILLING
 LAB_RATES = {
     "PFM": 350.0,
     "Zirconia": 900.0,
