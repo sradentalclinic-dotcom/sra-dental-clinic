@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 
 # Database Configuration
-DATABASE_URL = "sqlite:////aura_dental.db"
+DATABASE_URL = "sqlite:///./aura_dental.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -50,6 +50,15 @@ class LabOrderModel(Base):
     status = Column(String, default="Pending")
     payment_status = Column(String, default="Unpaid")
     order_date = Column(Date, default=date.today)
+
+class ArchSummaryModel(Base):
+    __tablename__ = "arch_summaries"
+    id = Column(Integer, primary_key=True, index=True)
+    opd_number = Column(String, index=True)
+    maxillary_status = Column(String)
+    maxillary_notes = Column(String)
+    mandibular_status = Column(String)
+    mandibular_teeth_count = Column(Integer)
 
 class ExtractionModel(Base):
     __tablename__ = "extractions"
@@ -249,6 +258,36 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
         db.add(patient)
         db.commit()
 
+    # Parse Arch Summary
+    arch_summary = root.find("ArchSummary")
+    if arch_summary is not None:
+        max_status, max_notes, mand_status, mand_count = "", "", "", 0
+        for arch in arch_summary.findall("Arch"):
+            region = arch.attrib.get("region")
+            if region == "Maxillary_Upper":
+                max_status = arch.attrib.get("status")
+                max_notes = arch.findtext("Notes")
+            elif region == "Mandibular_Lower":
+                mand_status = arch.attrib.get("status")
+                mand_count = int(arch.findtext("ActiveTeethCount") or 0)
+        
+        # Upsert Arch Summary
+        existing_arch = db.query(ArchSummaryModel).filter(ArchSummaryModel.opd_number == opd_number).first()
+        if existing_arch:
+            existing_arch.maxillary_status = max_status
+            existing_arch.maxillary_notes = max_notes
+            existing_arch.mandibular_status = mand_status
+            existing_arch.mandibular_teeth_count = mand_count
+        else:
+            arch_rec = ArchSummaryModel(
+                opd_number=opd_number,
+                maxillary_status=max_status,
+                maxillary_notes=max_notes,
+                mandibular_status=mand_status,
+                mandibular_teeth_count=mand_count
+            )
+            db.add(arch_rec)
+
     # Parse Extractions
     extractions = root.find("Extractions")
     if extractions is not None:
@@ -317,7 +356,7 @@ def import_patient_xml(payload: XMLImportPayload, db: Session = Depends(get_db))
             db.add(attachment)
 
     db.commit()
-    return {"status": "success", "opd_number": opd_number, "message": "Clinical XML Imported Successfully"}
+    return {"status": "success", "opd_number": opd_number, "message": "Clinical XML and Arch Summary Imported Successfully"}
 
 @app.get("/patients/{opd_number}")
 def get_patient(opd_number: str, db: Session = Depends(get_db)):
@@ -344,9 +383,19 @@ def get_patient(opd_number: str, db: Session = Depends(get_db)):
 
 @app.get("/patients/{opd_number}/clinical-records")
 def get_clinical_records(opd_number: str, db: Session = Depends(get_db)):
+    arch_summary = db.query(ArchSummaryModel).filter(ArchSummaryModel.opd_number == opd_number).first()
     extractions = db.query(ExtractionModel).filter(ExtractionModel.opd_number == opd_number).all()
     endos = db.query(EndoRecordModel).filter(EndoRecordModel.opd_number == opd_number).all()
     attachments = db.query(AttachmentModel).filter(AttachmentModel.opd_number == opd_number).all()
+
+    arch_data = None
+    if arch_summary:
+        arch_data = {
+            "maxillary_status": arch_summary.maxillary_status,
+            "maxillary_notes": arch_summary.maxillary_notes,
+            "mandibular_status": arch_summary.mandibular_status,
+            "mandibular_teeth_count": arch_summary.mandibular_teeth_count
+        }
 
     endo_list = []
     for e in endos:
@@ -392,6 +441,7 @@ def get_clinical_records(opd_number: str, db: Session = Depends(get_db)):
     } for a in attachments]
 
     return {
+        "arch_summary": arch_data,
         "extractions": ext_list,
         "endodontics": endo_list,
         "attachments": att_list
