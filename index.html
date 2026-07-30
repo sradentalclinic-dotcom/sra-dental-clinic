@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SRA Dental Enterprise Operatory Portal</title>
+  <title>SRA Dental Imperial Suite</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #F8FAFC;
+      --bg: #F4F6F9;
       --card: #FFFFFF;
-      --primary: #0F172A;
-      --accent: #2563EB;
-      --accent-hover: #1D4ED8;
+      --primary: #0B132B;
+      --primary-soft: #1C2541;
+      --accent-gold: #C5A880;
+      --accent-gold-hover: #B39265;
+      --gold-light: #FDFBF7;
+      --gold-border: #E6D7C3;
       --emerald: #059669;
-      --amber: #D97706;
       --border: #E2E8F0;
-      --soft-bg: #F1F5F9;
-      --whatsapp: #16A34A;
-      --danger: #E11D48;
+      --soft-bg: #F8FAFC;
+      --whatsapp: #15803D;
+      --danger: #991B1B;
+      --danger-soft: #FEF2F2;
     }
 
     body {
@@ -32,58 +35,61 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 14px 4%;
+      padding: 16px 4%;
       background: var(--primary);
       color: #FFF;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      border-bottom: 2px solid var(--accent-gold);
+      box-shadow: 0 4px 20px rgba(11, 19, 43, 0.25);
     }
 
     .brand-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 20px;
+      font-size: 21px;
       color: #FFF;
       margin: 0;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .brand-title span {
-      color: #38BDF8;
+      color: var(--accent-gold);
     }
 
     .nav-tabs {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
     .tab-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(197, 168, 128, 0.3);
       color: #E2E8F0;
-      padding: 8px 16px;
+      padding: 9px 16px;
       border-radius: 6px;
       font-weight: 600;
       font-size: 11px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
 
     .tab-btn.active, .tab-btn:hover {
-      background: var(--accent);
-      color: #FFF;
-      border-color: var(--accent);
+      background: var(--accent-gold);
+      color: var(--primary);
+      border-color: var(--accent-gold);
+      font-weight: 700;
     }
 
     .container {
-      max-width: 1280px;
-      margin: 25px auto;
+      max-width: 1300px;
+      margin: 28px auto;
       padding: 0 3%;
     }
 
@@ -104,10 +110,11 @@
 
     .metric-card {
       background: var(--card);
-      padding: 18px;
+      padding: 20px;
       border-radius: 10px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      border: 1px solid var(--gold-border);
+      box-shadow: 0 4px 12px rgba(197, 168, 128, 0.08);
+      position: relative;
     }
 
     .metric-title {
@@ -115,12 +122,13 @@
       text-transform: uppercase;
       color: #64748B;
       font-weight: 700;
+      letter-spacing: 0.5px;
       margin-bottom: 6px;
     }
 
     .metric-value {
       font-family: 'Outfit', sans-serif;
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
       color: var(--primary);
       margin: 0;
@@ -128,10 +136,10 @@
 
     .card {
       background: var(--card);
-      padding: 24px;
-      border-radius: 10px;
+      padding: 26px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
       margin-bottom: 25px;
     }
 
@@ -140,14 +148,15 @@
       font-size: 18px;
       color: var(--primary);
       margin-top: 0;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      border-bottom: 2px solid var(--gold-border);
+      padding-bottom: 12px;
+      letter-spacing: 0.3px;
     }
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
     }
 
     label {
@@ -155,13 +164,14 @@
       font-weight: 700;
       color: #334155;
       text-transform: uppercase;
+      letter-spacing: 0.4px;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 12px;
       background: #FFF;
       border: 1px solid #CBD5E1;
       border-radius: 6px;
@@ -172,54 +182,78 @@
 
     input:focus, select:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: var(--accent-gold);
     }
 
     .btn-gold {
-      background: var(--accent);
-      color: #FFF;
+      background: var(--accent-gold);
+      color: var(--primary);
       border: none;
-      padding: 10px 18px;
+      padding: 11px 20px;
       border-radius: 6px;
       font-weight: 700;
       text-transform: uppercase;
       font-size: 11px;
+      letter-spacing: 0.5px;
       cursor: pointer;
       transition: 0.2s;
       margin-top: 10px;
     }
 
     .btn-gold:hover {
-      background: var(--accent-hover);
+      background: var(--accent-gold-hover);
+      color: #FFF;
     }
 
     .btn-wa {
       background: var(--whatsapp);
       color: #FFF;
       border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
+      padding: 7px 12px;
+      border-radius: 5px;
       font-weight: 700;
       font-size: 11px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
     .btn-wa:hover {
-      background: #15803D;
+      background: #166534;
     }
 
     .btn-outline {
       background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent);
+      border: 1px solid var(--accent-gold);
+      color: var(--primary);
     }
 
     .btn-danger {
-      background: var(--danger);
+      background: #DC2626;
       color: #FFF;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+    }
+
+    .badge-paid {
+      background: #DEF7EC;
+      color: #03543F;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .badge-pending {
+      background: #FDE8E8;
+      color: #9B1C1C;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
     }
 
     table {
@@ -230,44 +264,72 @@
     }
 
     th, td {
-      padding: 10px 12px;
+      padding: 11px 13px;
       text-align: left;
       font-size: 13px;
       border-bottom: 1px solid var(--border);
     }
 
     th {
-      background: #F8FAFC;
+      background: var(--primary-soft);
       font-family: 'Outfit', sans-serif;
-      color: var(--primary);
-      font-weight: 700;
+      color: #FFF;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.5px;
     }
 
     .dynamic-section {
       background: var(--soft-bg);
-      padding: 20px;
+      padding: 22px;
       border-radius: 8px;
       border: 1px solid var(--border);
       margin-top: 20px;
     }
 
     .file-upload-box {
-      border: 2px dashed var(--accent);
-      padding: 15px;
-      border-radius: 6px;
+      border: 2px dashed var(--accent-gold);
+      padding: 18px;
+      border-radius: 8px;
       background: #FFF;
       text-align: center;
+    }
+
+    .calculation-box {
+      background: var(--gold-light);
+      border: 1px solid var(--gold-border);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calc-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    .calc-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
     }
   </style>
 </head>
 <body>
 
   <nav class="navbar">
-    <h2 class="brand-title">🦷 SRA DENTAL <span>OPERATORY</span></h2>
+    <h2 class="brand-title">SRA DENTAL <span>OPERATORY</span></h2>
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" onclick="switchTab('register')">New Patient</button>
-      <button class="tab-btn" onclick="switchTab('treatment')" style="background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE;">Clinical Operatory Chart</button>
+      <button class="tab-btn" onclick="switchTab('treatment')">Operatory Chart</button>
+      <button class="tab-btn" onclick="switchTab('labwork')" style="border-color:#C5A880; color:#FDFBF7;">Lab Work & Bills</button>
       <button class="tab-btn" onclick="switchTab('appointments')">Appointments</button>
       <button class="tab-btn" onclick="switchTab('logs')">Daily Logs & Recall</button>
     </div>
@@ -280,57 +342,57 @@
       <div class="analytics-grid">
         <div class="metric-card"><div class="metric-title">Today's Revenue</div><div class="metric-value" id="statTodayRev">₹0</div></div>
         <div class="metric-card"><div class="metric-title">Month's Revenue</div><div class="metric-value" id="statMonthRev">₹0</div></div>
-        <div class="metric-card"><div class="metric-title">Total Dues</div><div class="metric-value" id="statTotalDues" style="color:#E11D48;">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Patient Dues</div><div class="metric-value" id="statTotalDues" style="color:#DC2626;">₹0</div></div>
+        <div class="metric-card"><div class="metric-title">Lab Bills Due</div><div class="metric-value" id="statLabDues" style="color:#B91C1C;">₹0</div></div>
         <div class="metric-card"><div class="metric-title">Daily OPD</div><div class="metric-value" id="statDailyOpd">0</div></div>
         <div class="metric-card"><div class="metric-title">Total OPD</div><div class="metric-value" id="statTotalOpd">0</div></div>
-        <div class="metric-card"><div class="metric-title">Reel Leads</div><div class="metric-value" id="statReelLeads">0</div></div>
-        <div class="metric-card"><div class="metric-title">Web Leads</div><div class="metric-value" id="statWebLeads">0</div></div>
       </div>
     </div>
 
     <!-- 2. REGISTER NEW PATIENT -->
     <div id="register" class="tab-content">
       <div class="card">
-        <h3>Patient Consultation & Operatory Registration</h3>
+        <h3>Patient Registration & Automatic Bill Calculation</h3>
         <div class="form-grid">
           <div><label>Patient Full Name *</label><input type="text" id="regName" placeholder="e.g. Rahul Sharma"></div>
+          <div><label>Age</label><input type="number" id="regAge" placeholder="e.g. 32"></div>
           <div><label>Phone Number *</label><input type="text" id="regPhone" placeholder="e.g. 9876543210"></div>
-          <div><label>Patient Place / City Address</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
-          <div><label>Select Procedure *</label><select id="regProc" onchange="updateProcPrice()"></select></div>
-          <div><label>Registration Time Slot</label><input type="time" id="regTime" value="10:00"></div>
-          <div><label>Operatory Chair Assignment</label>
+          <div><label>Place / Address</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
+          <div><label>Procedure *</label><select id="regProc" onchange="updateRegisterCalculations()"></select></div>
+          <div><label>Units / Quantity *</label><input type="number" id="regUnits" value="1" min="1" oninput="updateRegisterCalculations()"></div>
+          <div><label>Chair Assignment</label>
             <select id="regChair">
               <option value="Operatory 1">Operatory 1</option>
               <option value="Operatory 2">Operatory 2</option>
               <option value="Surgical Suite">Surgical Suite</option>
             </select>
           </div>
-          <div><label>Procedure Price (₹)</label><input type="number" id="regBasePrice" readonly></div>
-          <div><label>Discount Given (₹)</label><input type="number" id="regDiscount" value="0"></div>
-          <div><label>Payment Received (₹)</label><input type="number" id="regPaid" value="0"></div>
-          <div><label>Next Appointment Date</label><input type="date" id="regNextDate"></div>
-          <div><label>Next Appointment Time</label><input type="time" id="regNextTime" value="11:00"></div>
-          <div><label>Lead / Referral Source</label>
-            <select id="regSource">
-              <option value="Website">Website</option>
-              <option value="Instagram Reel">Instagram Reel</option>
-              <option value="Walk-in">Walk-in</option>
-              <option value="Referral">Referral</option>
-            </select>
-          </div>
-          <div><label>Extracted / Target Tooth (Optional)</label><input type="text" id="regExtractedTooth" placeholder="e.g. 16, 26"></div>
+          <div><label>Unit Rate (₹)</label><input type="number" id="regBasePrice" readonly></div>
+          <div><label>Discount Allowed (₹)</label><input type="number" id="regDiscount" value="0" oninput="updateRegisterCalculations()"></div>
+          <div><label>Payment Received (₹)</label><input type="number" id="regPaid" value="0" oninput="updateRegisterCalculations()"></div>
+          <div><label>Appt Date</label><input type="date" id="regNextDate"></div>
+          <div><label>Appt Time</label><input type="time" id="regNextTime" value="11:00"></div>
         </div>
-        <button class="btn-gold" style="padding: 12px 25px; margin-top: 20px;" onclick="registerPatient()">Register Patient & Launch Operatory Chart</button>
-        <div id="regStatus" style="margin-top: 15px; font-weight: bold; color: #16A34A;"></div>
+
+        <div class="calculation-box">
+          <div>
+            <div class="calc-title">Calculated Net Total Bill</div>
+            <div style="font-size: 11px; color: #64748B;">Formula: (Unit Rate × Units) - Discount</div>
+          </div>
+          <div class="calc-value" id="regCalculatedTotal">₹0</div>
+        </div>
+
+        <button class="btn-gold" style="padding: 13px 28px; margin-top: 20px;" onclick="registerPatient()">Register Patient & Open Chart</button>
+        <div id="regStatus" style="margin-top: 15px; font-weight: bold; color: var(--emerald);"></div>
       </div>
     </div>
 
-    <!-- 3. CLINICAL OPERATORY & EDITABLE PATIENT DETAILS -->
+    <!-- 3. CLINICAL OPERATORY & EDIT PATIENT -->
     <div id="treatment" class="tab-content">
       <div class="card">
-        <h3>Enterprise Operatory Charting & Patient Record Edit</h3>
+        <h3>Clinical Operatory Chart & Record Edit</h3>
         
-        <div class="form-grid" style="align-items: end; border-bottom: 2px solid var(--border); padding-bottom: 15px;">
+        <div class="form-grid" style="align-items: end; border-bottom: 2px solid var(--border); padding-bottom: 16px;">
           <div><label>Enter Patient OPD Number</label><input type="text" id="treatOpd" placeholder="e.g. OPD-101"></div>
           <div><button class="btn-gold" onclick="loadTreatmentDetails()">Fetch Patient Chart</button></div>
         </div>
@@ -338,13 +400,15 @@
         <div id="dynamicTreatmentArea" style="display: none; margin-top: 20px;">
           <h4 id="treatPatientInfo" style="font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--primary); margin-bottom: 15px;"></h4>
 
-          <!-- EDIT PATIENT DETAILS CARD -->
-          <div class="card" style="background: #F0F9FF; border: 1px solid #BAE6FD;">
-            <h3 style="margin-top:0; color: #0369A1;">✏️ Edit Patient Record</h3>
+          <!-- EDIT PATIENT CARD -->
+          <div class="card" style="background: var(--gold-light); border: 1px solid var(--gold-border);">
+            <h3 style="margin-top:0; color: var(--primary); border-color: var(--gold-border);">Edit Patient Record & Adjust Fees</h3>
             <div class="form-grid">
               <div><label>Patient Full Name</label><input type="text" id="editName"></div>
+              <div><label>Age</label><input type="number" id="editAge"></div>
               <div><label>Phone Number</label><input type="text" id="editPhone"></div>
               <div><label>Place / City</label><input type="text" id="editPlace"></div>
+              <div><label>Units / Quantity</label><input type="number" id="editUnits" min="1" oninput="updateEditCalculations()"></div>
               <div><label>Operatory Chair</label>
                 <select id="editChair">
                   <option value="Operatory 1">Operatory 1</option>
@@ -352,17 +416,29 @@
                   <option value="Surgical Suite">Surgical Suite</option>
                 </select>
               </div>
-              <div><label>Total Payment Received (₹)</label><input type="number" id="editPaid"></div>
-              <div><label>Discount Given (₹)</label><input type="number" id="editDiscount"></div>
+              <div><label>Discount Allowed (₹)</label><input type="number" id="editDiscount" oninput="updateEditCalculations()"></div>
+              <div><label>Total Payment Paid (₹)</label><input type="number" id="editPaid" oninput="updateEditCalculations()"></div>
               <div><label>Next Appt Date</label><input type="date" id="editNextDate"></div>
               <div><label>Next Appt Time</label><input type="time" id="editNextTime"></div>
             </div>
-            <button class="btn-gold" style="margin-top:15px; background: #0284C7;" onclick="updatePatientDetails()">Save Record Changes</button>
-            <span id="updateStatus" style="margin-left:10px; font-weight:bold; color:#16A34A;"></span>
+
+            <div class="calculation-box" style="background:#FFF;">
+              <div>
+                <div class="calc-title">Updated Calculated Total</div>
+                <div style="font-size: 11px; color: #64748B;">Auto-calculated based on Units & Discount</div>
+              </div>
+              <div class="calc-value" id="editCalculatedTotal">₹0</div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; align-items: center; margin-top: 18px;">
+              <button class="btn-gold" style="background: var(--primary); color: #FFF;" onclick="updatePatientDetails()">Save Changes</button>
+              <button class="btn-gold btn-danger" onclick="deletePatient()">Delete Record</button>
+              <span id="updateStatus" style="font-weight:bold; color:var(--emerald);"></span>
+            </div>
           </div>
 
           <div class="dynamic-section">
-            <h3 style="margin-top: 0; color: var(--primary); border-bottom: none;">🦷 Tooth & Canal Operatory Charting</h3>
+            <h3 style="margin-top: 0; color: var(--primary); border-bottom: none;">Tooth & Canal Charting</h3>
             
             <div class="form-grid">
               <div>
@@ -371,15 +447,14 @@
               </div>
             </div>
 
-            <!-- DYNAMIC HAND-TYPED CANAL TABLE -->
             <div id="canalTableContainer" style="margin-top: 20px;"></div>
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
               <button class="btn-gold btn-outline" type="button" onclick="addCustomCanalRow()">+ Add Custom Canal Row</button>
-              <button class="btn-gold" style="background: var(--emerald);" type="button" onclick="saveEndoData()">Save Operatory Charting Data</button>
+              <button class="btn-gold" style="background: var(--emerald); color: #FFF;" type="button" onclick="saveEndoData()">Save Charting Data</button>
             </div>
 
-            <h4 style="margin-top: 25px; font-family: 'Outfit', sans-serif; color: var(--primary);">📁 Operatory File Attachments</h4>
+            <h4 style="margin-top: 25px; font-family: 'Outfit', sans-serif; color: var(--primary);">File Attachments</h4>
             <div class="form-grid">
               <div class="file-upload-box">
                 <label>Upload X-Ray File</label>
@@ -392,37 +467,90 @@
                 <button class="btn-gold" onclick="uploadTreatmentFile('BMP')">Upload BMP File</button>
               </div>
             </div>
-            <p id="fileUploadStatus" style="font-weight:bold; color:#16A34A; margin-top:15px; text-align:center;"></p>
+            <p id="fileUploadStatus" style="font-weight:bold; color:var(--emerald); margin-top:15px; text-align:center;"></p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 4. APPOINTMENTS WITH WHATSAPP REMINDER LINK -->
+    <!-- 4. LAB WORK & LAB BILLS TAB -->
+    <div id="labwork" class="tab-content">
+      <div class="card">
+        <h3>Dental Laboratory Work Orders & Auto Lab Billing</h3>
+        <div class="form-grid">
+          <div><label>Patient OPD Number *</label><input type="text" id="labOpd" placeholder="e.g. OPD-101"></div>
+          <div><label>Lab Item *</label>
+            <select id="labItem" onchange="updateLabCostCalculation()">
+              <option value="PFM">PFM Crown (₹350/unit)</option>
+              <option value="Zirconia">Zirconia Crown (₹900/unit)</option>
+              <option value="Denture">Complete Denture (₹1100/unit)</option>
+              <option value="Metal Cap">Metal Cap (₹150/unit)</option>
+              <option value="RPD">RPD (₹50/tooth)</option>
+            </select>
+          </div>
+          <div><label>Units / Number of Teeth *</label><input type="number" id="labUnits" value="1" min="1" oninput="updateLabCostCalculation()"></div>
+          <div><label>Laboratory Name</label><input type="text" id="labName" value="Premier Dental Lab"></div>
+        </div>
+
+        <div class="calculation-box">
+          <div>
+            <div class="calc-title">Auto-Calculated Lab Cost</div>
+            <div style="font-size: 11px; color: #64748B;">Auto-selected Lab Rate × Units</div>
+          </div>
+          <div class="calc-value" id="labCostDisplay">₹350</div>
+        </div>
+
+        <button class="btn-gold" style="margin-top: 18px;" onclick="createLabOrder()">Submit Lab Order</button>
+      </div>
+
+      <div class="card">
+        <h3>Active Lab Orders & Payable Bills</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>OPD</th>
+              <th>Patient Name</th>
+              <th>Lab Item</th>
+              <th>Units</th>
+              <th>Unit Rate</th>
+              <th>Total Lab Bill</th>
+              <th>Lab Name</th>
+              <th>Order Status</th>
+              <th>Payment Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="labOrdersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. APPOINTMENTS -->
     <div id="appointments" class="tab-content">
       <div class="card">
         <h3>Today's Scheduled Operatory Appointments</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Phone</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th><th>Dues</th><th>WhatsApp Action</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Age</th><th>Phone</th><th>Location</th><th>Procedure</th><th>Units</th><th>Chair</th><th>Slot</th><th>Dues</th><th>WhatsApp Action</th></tr></thead>
           <tbody id="todayApptTable"></tbody>
         </table>
       </div>
       <div class="card">
-        <h3>Future Scheduled Appointments & 1-Day Reminders</h3>
+        <h3>Future Scheduled Appointments & Reminders</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Appt Time</th><th>Location</th><th>Procedure</th><th>Chair</th><th>WhatsApp Action</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Appt Time</th><th>Location</th><th>Procedure</th><th>Units</th><th>Chair</th><th>WhatsApp Action</th></tr></thead>
           <tbody id="futureApptTable"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 5. DAILY LOGS & 6-MONTH SCALING RECALL -->
+    <!-- 6. DAILY LOGS & 6-MONTH SCALING RECALL -->
     <div id="logs" class="tab-content">
       <div class="card">
-        <h3>Daily Patient Operatory Logs & 6-Month Scaling Reminders</h3>
+        <h3>Daily Patient Operatory Logs & 6-Month Recall</h3>
         <input type="text" id="logSearch" placeholder="Search by Patient Name or OPD..." onkeyup="loadDailyLogs()" style="margin-bottom: 15px; width: 320px;">
         <table>
-          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Location</th><th>Procedure</th><th>Sitting</th><th>Chair</th><th>Total</th><th>Paid</th><th>Due</th><th>6-Mo Recall</th><th>Action</th></tr></thead>
+          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Age</th><th>Location</th><th>Procedure</th><th>Units</th><th>Chair</th><th>Total</th><th>Paid</th><th>Due</th><th>6-Mo Recall</th><th>Action</th></tr></thead>
           <tbody id="logsTable"></tbody>
         </table>
       </div>
@@ -432,13 +560,23 @@
 
   <script>
     let proceduresCache = [];
+    const LAB_RATES = {
+      "PFM": 350,
+      "Zirconia": 900,
+      "Denture": 1100,
+      "Metal Cap": 150,
+      "RPD": 50
+    };
 
     window.onload = function() { 
       loadDashboard(); 
       loadProcedures(); 
+      loadLabOrders();
       loadAppointments(); 
       loadDailyLogs(); 
       populateTeethDropdown(); 
+      updateRegisterCalculations();
+      updateLabCostCalculation();
     };
 
     function switchTab(tabId) {
@@ -450,6 +588,7 @@
       btns.forEach(b => { if(b.getAttribute('onclick').includes(tabId)) b.classList.add('active'); });
 
       if(tabId === 'dashboard') loadDashboard();
+      if(tabId === 'labwork') loadLabOrders();
       if(tabId === 'appointments') loadAppointments();
       if(tabId === 'logs') loadDailyLogs();
     }
@@ -483,10 +622,9 @@
         document.getElementById('statTodayRev').innerText = `₹${data.today_revenue}`;
         document.getElementById('statMonthRev').innerText = `₹${data.month_revenue}`;
         document.getElementById('statTotalDues').innerText = `₹${data.total_dues}`;
+        document.getElementById('statLabDues').innerText = `₹${data.total_lab_dues || 0}`;
         document.getElementById('statDailyOpd').innerText = data.today_opd;
         document.getElementById('statTotalOpd').innerText = data.total_opd;
-        document.getElementById('statReelLeads').innerText = data.reel_leads;
-        document.getElementById('statWebLeads').innerText = data.web_leads;
       } catch (e) { console.error("Error loading analytics"); }
     }
 
@@ -496,20 +634,44 @@
         proceduresCache = await res.json();
         const select = document.getElementById('regProc');
         select.innerHTML = '<option value="">-- Choose Procedure --</option>';
-        proceduresCache.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price})</option>`);
+        proceduresCache.forEach(p => select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price}/unit)</option>`);
       } catch (e) { console.error("Error loading procedures"); }
     }
 
-    function updateProcPrice() {
-      const id = parseInt(document.getElementById('regProc').value);
-      const proc = proceduresCache.find(p => p.id === id);
-      document.getElementById('regBasePrice').value = proc ? proc.price : 0;
+    function updateRegisterCalculations() {
+      const procId = parseInt(document.getElementById('regProc').value);
+      const proc = proceduresCache.find(p => p.id === procId);
+      const basePrice = proc ? proc.price : 0;
+      document.getElementById('regBasePrice').value = basePrice;
+
+      const units = parseInt(document.getElementById('regUnits').value) || 1;
+      const discount = parseFloat(document.getElementById('regDiscount').value) || 0;
+      const total = Math.max(0, (basePrice * units) - discount);
+      
+      document.getElementById('regCalculatedTotal').innerText = `₹${total}`;
+    }
+
+    function updateEditCalculations() {
+      const basePrice = parseFloat(document.getElementById('editName').getAttribute('data-baseprice')) || 0;
+      const units = parseInt(document.getElementById('editUnits').value) || 1;
+      const discount = parseFloat(document.getElementById('editDiscount').value) || 0;
+      const total = Math.max(0, (basePrice * units) - discount);
+
+      document.getElementById('editCalculatedTotal').innerText = `₹${total}`;
+    }
+
+    function updateLabCostCalculation() {
+      const item = document.getElementById('labItem').value;
+      const units = parseInt(document.getElementById('labUnits').value) || 1;
+      const rate = LAB_RATES[item] || 0;
+      document.getElementById('labCostDisplay').innerText = `₹${rate * units}`;
     }
 
     async function registerPatient() {
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
       const procId = document.getElementById('regProc').value;
+      const ageVal = document.getElementById('regAge').value;
 
       if (!name || !phone || !procId) {
         alert("Please fill in: Patient Name, Phone Number, and Procedure!");
@@ -518,16 +680,16 @@
 
       const payload = {
         patient_name: name,
+        age: ageVal ? parseInt(ageVal) : null,
         phone_number: phone,
         patient_place: document.getElementById('regPlace').value || "Mandi Dabwali",
         procedure_id: parseInt(procId),
-        time_slot: document.getElementById('regTime').value || "10:00",
+        units: parseInt(document.getElementById('regUnits').value) || 1,
+        time_slot: "10:00",
         payment_done: parseFloat(document.getElementById('regPaid').value) || 0,
         discount: parseFloat(document.getElementById('regDiscount').value) || 0,
         next_appointment: document.getElementById('regNextDate').value || null,
         next_appointment_time: document.getElementById('regNextTime').value || null,
-        source: document.getElementById('regSource').value,
-        extracted_tooth: document.getElementById('regExtractedTooth').value || null,
         operatory_chair: document.getElementById('regChair').value
       };
 
@@ -538,48 +700,17 @@
           body: JSON.stringify(payload) 
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          alert(`Error Saving Patient: ${JSON.stringify(errData.detail || errData)}`);
-          return;
-        }
+        if (!res.ok) { alert("Error saving patient record."); return; }
 
         const data = await res.json();
-        document.getElementById('regStatus').innerText = `✅ Patient Saved Permanently! OPD: ${data.opd_number}`;
+        document.getElementById('regStatus').innerText = `Patient Registered Successfully! OPD: ${data.opd_number}`;
         
         setTimeout(() => {
           document.getElementById('treatOpd').value = data.opd_number;
           switchTab('treatment');
           loadTreatmentDetails();
-        }, 1200);
-      } catch (e) { 
-        alert("Failed to reach backend server: " + e.message); 
-      }
-    }
-
-    function populateTeethDropdown() {
-      const select = document.getElementById('endoToothNum');
-      select.innerHTML = '<option value="">-- Select Tooth Number --</option>';
-      
-      const adultGroups = [ 
-        {label: 'Upper Right (11 to 18)', start:11, end:18}, {label: 'Upper Left (21 to 28)', start:21, end:28}, 
-        {label: 'Lower Left (31 to 38)', start:31, end:38}, {label: 'Lower Right (41 to 48)', start:41, end:48} 
-      ];
-      adultGroups.forEach(g => {
-        let group = document.createElement('optgroup'); group.label = `Adult Dentition: ${g.label}`;
-        for(let i=g.start; i<=g.end; i++) group.innerHTML += `<option value="${i}">Tooth ${i}</option>`;
-        select.appendChild(group);
-      });
-
-      const primaryGroups = [ 
-        {label: 'Upper Right (51 to 55)', start:51, end:55}, {label: 'Upper Left (61 to 65)', start:61, end:65}, 
-        {label: 'Lower Left (71 to 75)', start:71, end:75}, {label: 'Lower Right (81 to 85)', start:81, end:85} 
-      ];
-      primaryGroups.forEach(g => {
-        let group = document.createElement('optgroup'); group.label = `Primary Dentition: ${g.label}`;
-        for(let i=g.start; i<=g.end; i++) group.innerHTML += `<option value="${i}">Tooth ${i}</option>`;
-        select.appendChild(group);
-      });
+        }, 1000);
+      } catch (e) { alert("Failed to reach backend server: " + e.message); }
     }
 
     async function loadTreatmentDetails() {
@@ -592,17 +723,22 @@
         const patient = await res.json();
         
         document.getElementById('dynamicTreatmentArea').style.display = 'block';
-        document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name} (${patient.patient_place}) | OPD: ${patient.opd_number} | Chair: ${patient.operatory_chair} | Procedure: ${patient.procedure_name}`;
+        const ageText = patient.age ? ` | Age: ${patient.age}` : '';
+        document.getElementById('treatPatientInfo').innerText = `Patient: ${patient.patient_name}${ageText} (${patient.patient_place}) | OPD: ${patient.opd_number} | Chair: ${patient.operatory_chair} | Procedure: ${patient.procedure_name} (${patient.units} Units)`;
 
-        // Populate Edit Form Inputs
         document.getElementById('editName').value = patient.patient_name || '';
+        document.getElementById('editName').setAttribute('data-baseprice', patient.base_price || 0);
+        document.getElementById('editAge').value = patient.age || '';
         document.getElementById('editPhone').value = patient.phone_number || '';
         document.getElementById('editPlace').value = patient.patient_place || '';
+        document.getElementById('editUnits').value = patient.units || 1;
         document.getElementById('editChair').value = patient.operatory_chair || 'Operatory 1';
         document.getElementById('editPaid').value = patient.total_paid || 0;
         document.getElementById('editDiscount').value = patient.discount || 0;
         document.getElementById('editNextDate').value = patient.next_appointment || '';
         document.getElementById('editNextTime').value = patient.next_appointment_time || '';
+
+        updateEditCalculations();
       } catch (e) { alert("Error connecting to server."); }
     }
 
@@ -610,10 +746,13 @@
       const opd = document.getElementById('treatOpd').value;
       if(!opd) return;
 
+      const ageVal = document.getElementById('editAge').value;
       const payload = {
         patient_name: document.getElementById('editName').value,
+        age: ageVal ? parseInt(ageVal) : null,
         phone_number: document.getElementById('editPhone').value,
         patient_place: document.getElementById('editPlace').value,
+        units: parseInt(document.getElementById('editUnits').value) || 1,
         operatory_chair: document.getElementById('editChair').value,
         payment_done: parseFloat(document.getElementById('editPaid').value) || 0,
         discount: parseFloat(document.getElementById('editDiscount').value) || 0,
@@ -629,17 +768,127 @@
         });
 
         if(res.ok) {
-          document.getElementById('updateStatus').innerText = "✅ Record Updated Successfully!";
-          setTimeout(() => { document.getElementById('updateStatus').innerText = ""; }, 3000);
+          document.getElementById('updateStatus').innerText = "Record Updated Successfully!";
+          setTimeout(() => { document.getElementById('updateStatus').innerText = ""; }, 2500);
           loadTreatmentDetails();
           loadAppointments();
           loadDailyLogs();
-        } else {
-          alert("Failed to update patient details.");
-        }
-      } catch(e) {
-        alert("Error updating record: " + e.message);
-      }
+        } else { alert("Failed to update patient details."); }
+      } catch(e) { alert("Error updating record: " + e.message); }
+    }
+
+    async function deletePatient() {
+      const opd = document.getElementById('treatOpd').value;
+      if (!opd) { alert("Please fetch an OPD number first!"); return; }
+
+      const confirmed = confirm(`Are you sure you want to permanently delete patient record ${opd}? This action cannot be undone.`);
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`/patients/${opd}`, { method: 'DELETE' });
+        if (res.ok) {
+          alert(`Patient ${opd} deleted successfully.`);
+          document.getElementById('dynamicTreatmentArea').style.display = 'none';
+          document.getElementById('treatOpd').value = '';
+          loadDashboard();
+          loadAppointments();
+          loadDailyLogs();
+        } else { alert("Failed to delete patient record."); }
+      } catch (e) { alert("Error deleting patient: " + e.message); }
+    }
+
+    // LAB WORK FUNCTIONS
+    async function createLabOrder() {
+      const opd = document.getElementById('labOpd').value.trim();
+      if(!opd) { alert("Please enter a valid Patient OPD Number!"); return; }
+
+      const payload = {
+        opd_number: opd,
+        lab_item: document.getElementById('labItem').value,
+        units: parseInt(document.getElementById('labUnits').value) || 1,
+        lab_name: document.getElementById('labName').value || "Premier Dental Lab"
+      };
+
+      try {
+        const res = await fetch('/lab-orders', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if(res.ok) {
+          alert("Lab order created successfully!");
+          document.getElementById('labOpd').value = "";
+          loadLabOrders();
+          loadDashboard();
+        } else { alert("Error creating lab order. Verify patient OPD number."); }
+      } catch(e) { alert("Failed to reach server."); }
+    }
+
+    async function loadLabOrders() {
+      try {
+        const res = await fetch('/lab-orders');
+        const orders = await res.json();
+
+        let html = '';
+        orders.forEach(o => {
+          const statusBadge = o.payment_status === 'Paid' ? '<span class="badge-paid">Paid</span>' : '<span class="badge-pending">Pending</span>';
+          html += `<tr>
+            <td>${o.date || '-'}</td>
+            <td><b>${o.opd_number}</b></td>
+            <td>${o.patient_name}</td>
+            <td><b>${o.lab_item}</b></td>
+            <td>${o.units}</td>
+            <td>₹${o.cost_per_unit}</td>
+            <td style="font-weight:bold; color:var(--primary);">₹${o.total_lab_cost}</td>
+            <td>${o.lab_name}</td>
+            <td>
+              <select onchange="updateLabStatus(${o.id}, this.value, null)" style="padding:4px; font-size:11px;">
+                <option value="Sent to Lab" ${o.status === 'Sent to Lab' ? 'selected' : ''}>Sent to Lab</option>
+                <option value="Received" ${o.status === 'Received' ? 'selected' : ''}>Received</option>
+                <option value="Fitted" ${o.status === 'Fitted' ? 'selected' : ''}>Fitted</option>
+              </select>
+            </td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn-gold" style="padding:4px 8px; font-size:10px;" onclick="updateLabStatus(${o.id}, null, '${o.payment_status === 'Paid' ? 'Pending' : 'Paid'}')">Toggle Payment</button>
+              <button class="btn-gold btn-danger" style="padding:4px 8px; font-size:10px;" onclick="deleteLabOrder(${o.id})">Delete</button>
+            </td>
+          </tr>`;
+        });
+        document.getElementById('labOrdersTable').innerHTML = html || '<tr><td colspan="11">No lab orders found.</td></tr>';
+      } catch(e) { console.error("Error loading lab orders"); }
+    }
+
+    async function updateLabStatus(id, status, paymentStatus) {
+      let url = `/lab-orders/${id}?`;
+      if(status) url += `status=${encodeURIComponent(status)}&`;
+      if(paymentStatus) url += `payment_status=${encodeURIComponent(paymentStatus)}`;
+
+      await fetch(url, { method: 'PUT' });
+      loadLabOrders();
+      loadDashboard();
+    }
+
+    async function deleteLabOrder(id) {
+      if(!confirm("Delete this lab order?")) return;
+      await fetch(`/lab-orders/${id}`, { method: 'DELETE' });
+      loadLabOrders();
+      loadDashboard();
+    }
+
+    function populateTeethDropdown() {
+      const select = document.getElementById('endoToothNum');
+      select.innerHTML = '<option value="">-- Select Tooth Number --</option>';
+      const adultGroups = [ 
+        {label: 'Upper Right (11 to 18)', start:11, end:18}, {label: 'Upper Left (21 to 28)', start:21, end:28}, 
+        {label: 'Lower Left (31 to 38)', start:31, end:38}, {label: 'Lower Right (41 to 48)', start:41, end:48} 
+      ];
+      adultGroups.forEach(g => {
+        let group = document.createElement('optgroup'); group.label = `Adult Dentition: ${g.label}`;
+        for(let i=g.start; i<=g.end; i++) group.innerHTML += `<option value="${i}">Tooth ${i}</option>`;
+        select.appendChild(group);
+      });
     }
 
     function generateCanalInputs() {
@@ -656,18 +905,13 @@
 
       let html = `<table>
         <thead>
-          <tr>
-            <th>Canal Name (Hand-Typed)</th>
-            <th>Working Length (mm)</th>
-            <th>BMP Size / Option</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>Canal Name</th><th>Working Length (mm)</th><th>BMP Size / Option</th><th>Action</th></tr>
         </thead>
         <tbody id="canalRowsBody">`;
 
       canals.forEach((c) => {
         html += `<tr>
-          <td><input type="text" class="canal-name" value="${c}" placeholder="e.g. MB1"></td>
+          <td><input type="text" class="canal-name" value="${c}"></td>
           <td><input type="text" class="canal-length" placeholder="e.g. 21.5 mm"></td>
           <td><input type="text" class="canal-bmp" placeholder="e.g. #25 / .04"></td>
           <td><button class="btn-gold btn-danger" style="padding:4px 8px; font-size:10px;" onclick="this.closest('tr').remove()">Remove</button></td>
@@ -679,13 +923,12 @@
 
     function addCustomCanalRow() {
       const tbody = document.getElementById('canalRowsBody');
-      if(!tbody) { alert("Please select a Tooth Number first!"); return; }
-      
+      if(!tbody) return;
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input type="text" class="canal-name" placeholder="Type canal name..."></td>
-        <td><input type="text" class="canal-length" placeholder="Type working length (mm)..."></td>
-        <td><input type="text" class="canal-bmp" placeholder="Type BMP size/option..."></td>
+        <td><input type="text" class="canal-name" placeholder="Canal name..."></td>
+        <td><input type="text" class="canal-length" placeholder="Working length..."></td>
+        <td><input type="text" class="canal-bmp" placeholder="BMP size..."></td>
         <td><button class="btn-gold btn-danger" style="padding:4px 8px; font-size:10px;" onclick="this.closest('tr').remove()">Remove</button></td>
       `;
       tbody.appendChild(tr);
@@ -694,11 +937,10 @@
     async function saveEndoData() {
       const opd = document.getElementById('treatOpd').value;
       const tooth = document.getElementById('endoToothNum').value;
-      if(!tooth) { alert("Select a Tooth Number!"); return; }
+      if(!tooth) return;
 
       const rows = document.querySelectorAll('#canalRowsBody tr');
       let dataToSave = [];
-
       rows.forEach(row => {
         dataToSave.push({
           canal: row.querySelector('.canal-name').value,
@@ -708,32 +950,28 @@
       });
 
       const payload = { opd_number: opd, tooth_number: tooth, canals_data: JSON.stringify(dataToSave) };
-      try {
-        await fetch('/patients/endo-chart', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-        alert("✅ Operatory Tooth Charting Data Saved!");
-      } catch (e) { alert("Failed to save tooth charting data."); }
+      await fetch('/patients/endo-chart', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+      alert("Operatory Charting Data Saved!");
     }
 
     async function uploadTreatmentFile(fileType) {
       const opd = document.getElementById('treatOpd').value;
       const tooth = document.getElementById('endoToothNum').value;
-      if(!tooth) { alert("Please select a Tooth Number first!"); return; }
+      if(!tooth) return;
 
       const fileInput = fileType === 'BMP' ? document.getElementById('fileBmp') : document.getElementById('fileXray');
-      if(fileInput.files.length === 0) { alert(`Select a ${fileType} file to upload!`); return; }
+      if(fileInput.files.length === 0) return;
 
       const formData = new FormData();
       formData.append("file_type", fileType);
       formData.append("tooth_number", tooth);
       formData.append("file", fileInput.files[0]);
 
-      try {
-        const res = await fetch(`/patients/${opd}/upload-treatment-file`, { method: 'POST', body: formData });
-        if(res.ok) {
-          document.getElementById('fileUploadStatus').innerText = `✅ ${fileType} File Uploaded for Tooth ${tooth}!`;
-          fileInput.value = "";
-        }
-      } catch (e) { alert("File upload failed."); }
+      const res = await fetch(`/patients/${opd}/upload-treatment-file`, { method: 'POST', body: formData });
+      if(res.ok) {
+        document.getElementById('fileUploadStatus').innerText = `${fileType} File Uploaded for Tooth ${tooth}!`;
+        fileInput.value = "";
+      }
     }
 
     async function loadAppointments() {
@@ -744,24 +982,23 @@
         let tHtml = '';
         data.today.forEach(i => {
           tHtml += `<tr>
-            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.phone}</td><td>${i.patient_place}</td>
-            <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td>
-            <td style="color:red; font-weight:bold;">₹${i.pending_payment}</td>
-            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', 'Today', '${i.time_slot}')">💬 Today Reminder</button></td>
+            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.age || '-'}</td><td>${i.phone}</td><td>${i.patient_place}</td>
+            <td>${i.procedure}</td><td>${i.units}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td>
+            <td style="color:#DC2626; font-weight:bold;">₹${i.pending_payment}</td>
+            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', 'Today', '${i.time_slot}')">WhatsApp Reminder</button></td>
           </tr>`;
         });
-        document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="9">No appointments today</td></tr>';
+        document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="11">No appointments today</td></tr>';
 
         let fHtml = '';
         data.future.forEach(i => {
-          const apptTime = i.next_appointment_time ? i.next_appointment_time : '10:00';
           fHtml += `<tr>
-            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${apptTime}</td>
-            <td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.operatory_chair}</td>
-            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', '${i.next_appointment}', '${apptTime}')">💬 1-Day Reminder</button></td>
+            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${i.next_appointment_time || '10:00'}</td>
+            <td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.units}</td><td>${i.operatory_chair}</td>
+            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', '${i.next_appointment}', '${i.next_appointment_time}')">1-Day Reminder</button></td>
           </tr>`;
         });
-        document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="8">No future appointments scheduled</td></tr>';
+        document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="9">No future appointments scheduled</td></tr>';
       } catch (e) { console.error("Error loading appointments"); }
     }
 
@@ -774,15 +1011,15 @@
         let html = '';
         data.forEach(p => {
           html += `<tr>
-            <td>${p.date}</td><td><b>${p.opd_number}</b></td><td>${p.patient_name}</td><td>${p.patient_place}</td>
-            <td>${p.procedure}</td><td>Sitting ${p.current_sitting}/${p.total_sittings}</td><td>${p.chair}</td>
-            <td>₹${p.total_amount}</td><td style="color:green;font-weight:bold;">₹${p.total_paid}</td>
-            <td style="color:red;font-weight:bold;">₹${p.payment_left}</td>
-            <td><button class="btn-wa" onclick="send6MonthScalingRecall('${p.phone}', '${p.patient_name}')">💬 6-Mo Recall</button></td>
+            <td>${p.date}</td><td><b>${p.opd_number}</b></td><td>${p.patient_name}</td><td>${p.age || '-'}</td><td>${p.patient_place}</td>
+            <td>${p.procedure}</td><td>${p.units}</td><td>${p.chair}</td>
+            <td>₹${p.total_amount}</td><td style="color:var(--emerald);font-weight:bold;">₹${p.total_paid}</td>
+            <td style="color:#DC2626;font-weight:bold;">₹${p.payment_left}</td>
+            <td><button class="btn-wa" onclick="send6MonthScalingRecall('${p.phone}', '${p.patient_name}')">6-Mo Recall</button></td>
             <td><button class="btn-gold" style="padding:4px 8px; font-size:10px;" onclick="document.getElementById('treatOpd').value='${p.opd_number}'; switchTab('treatment'); loadTreatmentDetails();">Operatory Chart</button></td>
           </tr>`;
         });
-        document.getElementById('logsTable').innerHTML = html || '<tr><td colspan="12">No patient logs found</td></tr>';
+        document.getElementById('logsTable').innerHTML = html || '<tr><td colspan="13">No patient logs found</td></tr>';
       } catch (e) { console.error("Error loading daily logs"); }
     }
   </script>
