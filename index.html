@@ -6,7 +6,7 @@
   <title>SRA Dental Enterprise Operatory Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #F8FAF9; --card: #FFFFFF; --gold: #9A7B38; --gold-dark: #7A5F26; --accent: #1E293B; --border: #E2E8F0; --soft-bg: #F1F5F9; }
+    :root { --bg: #F8FAF9; --card: #FFFFFF; --gold: #9A7B38; --gold-dark: #7A5F26; --accent: #1E293B; --border: #E2E8F0; --soft-bg: #F1F5F9; --whatsapp: #16A34A; }
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #0F172A; margin: 0; padding: 0; }
     
     .navbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 4%; background: #FFF; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
@@ -34,6 +34,8 @@
     
     .btn-gold { background: var(--gold); color: #FFF; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 11px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
     .btn-gold:hover { background: var(--gold-dark); }
+    .btn-wa { background: var(--whatsapp); color: #FFF; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-wa:hover { background: #15803D; }
     .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold-dark); }
     .btn-danger { background: #E11D48; color: #FFF; }
     
@@ -54,7 +56,7 @@
       <button class="tab-btn" onclick="switchTab('register')">New Patient</button>
       <button class="tab-btn" onclick="switchTab('treatment')" style="background:#FEF3C7; color:#92400E; border-color:#F59E0B;">Clinical Operatory Chart</button>
       <button class="tab-btn" onclick="switchTab('appointments')">Appointments</button>
-      <button class="tab-btn" onclick="switchTab('logs')">Daily Logs</button>
+      <button class="tab-btn" onclick="switchTab('logs')">Daily Logs & Recall</button>
     </div>
   </nav>
 
@@ -82,7 +84,7 @@
           <div><label>Phone Number</label><input type="text" id="regPhone" placeholder="e.g. 9876543210"></div>
           <div><label>Patient Place / City Address</label><input type="text" id="regPlace" value="Mandi Dabwali"></div>
           <div><label>Select Procedure</label><select id="regProc" onchange="updateProcPrice()"></select></div>
-          <div><label>Time Slot</label><input type="time" id="regTime" value="10:00"></div>
+          <div><label>Registration Time Slot</label><input type="time" id="regTime" value="10:00"></div>
           <div><label>Operatory Chair Assignment</label>
             <select id="regChair">
               <option value="Operatory 1">Operatory 1</option>
@@ -93,7 +95,8 @@
           <div><label>Procedure Price (₹)</label><input type="number" id="regBasePrice" readonly></div>
           <div><label>Discount Given (₹)</label><input type="number" id="regDiscount" value="0"></div>
           <div><label>Payment Received (₹)</label><input type="number" id="regPaid" value="0"></div>
-          <div><label>Next Scheduled Appointment</label><input type="date" id="regNextDate"></div>
+          <div><label>Next Appointment Date</label><input type="date" id="regNextDate"></div>
+          <div><label>Next Appointment Time</label><input type="time" id="regNextTime" value="11:00"></div>
           <div><label>Lead / Referral Source</label>
             <select id="regSource">
               <option value="Website">Website</option>
@@ -159,31 +162,31 @@
       </div>
     </div>
 
-    <!-- 4. APPOINTMENTS -->
+    <!-- 4. APPOINTMENTS WITH WHATSAPP REMINDER LINK -->
     <div id="appointments" class="tab-content">
       <div class="card">
         <h3>Today's Scheduled Operatory Appointments</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Phone</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th><th>Dues</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Phone</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th><th>Dues</th><th>WhatsApp Action</th></tr></thead>
           <tbody id="todayApptTable"></tbody>
         </table>
       </div>
       <div class="card">
-        <h3>Future Scheduled Appointments</h3>
+        <h3>Future Scheduled Appointments & 1-Day Reminders</h3>
         <table>
-          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Location</th><th>Procedure</th><th>Chair</th><th>Slot</th></tr></thead>
+          <thead><tr><th>OPD</th><th>Name</th><th>Date</th><th>Appt Time</th><th>Location</th><th>Procedure</th><th>Chair</th><th>WhatsApp Action</th></tr></thead>
           <tbody id="futureApptTable"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 5. DAILY LOGS -->
+    <!-- 5. DAILY LOGS & 6-MONTH SCALING RECALL -->
     <div id="logs" class="tab-content">
       <div class="card">
-        <h3>Daily Patient Operatory Logs & Financial Ledger</h3>
+        <h3>Daily Patient Operatory Logs & 6-Month Scaling Reminders</h3>
         <input type="text" id="logSearch" placeholder="Search by Patient Name or OPD..." onkeyup="loadDailyLogs()" style="margin-bottom: 15px; width: 320px;">
         <table>
-          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Location</th><th>Procedure</th><th>Sitting</th><th>Chair</th><th>Total</th><th>Paid</th><th>Due</th><th>Source</th><th>Action</th></tr></thead>
+          <thead><tr><th>Date</th><th>OPD</th><th>Name</th><th>Location</th><th>Procedure</th><th>Sitting</th><th>Chair</th><th>Total</th><th>Paid</th><th>Due</th><th>6-Mo Recall</th><th>Action</th></tr></thead>
           <tbody id="logsTable"></tbody>
         </table>
       </div>
@@ -213,6 +216,29 @@
       if(tabId === 'dashboard') loadDashboard();
       if(tabId === 'appointments') loadAppointments();
       if(tabId === 'logs') loadDailyLogs();
+    }
+
+    // --- WHATSAPP UTILITY FUNCTIONS ---
+    function cleanPhoneNumber(phone) {
+      if(!phone) return '';
+      let cleaned = phone.replace(/\D/g, '');
+      if(cleaned.length === 10) cleaned = '91' + cleaned;
+      return cleaned;
+    }
+
+    function send1DayWhatsAppReminder(phone, name, date, time) {
+      const cleanPhone = cleanPhoneNumber(phone);
+      if(!cleanPhone) { alert("Invalid phone number!"); return; }
+      const timeStr = time ? ` at ${time}` : '';
+      const text = `Dear ${name},\n\nThis is a friendly appointment reminder from *SRA Dental Clinic* for your upcoming visit scheduled on *${date}${timeStr}*.\n\nPlease confirm your availability or contact us if you need to reschedule.\n\nThank you!\n*SRA Dental Clinic, Mandi Dabwali*`;
+      window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function send6MonthScalingRecall(phone, name) {
+      const cleanPhone = cleanPhoneNumber(phone);
+      if(!cleanPhone) { alert("Invalid phone number!"); return; }
+      const text = `Dear ${name},\n\nIt has been 6 months since your last dental visit at *SRA Dental Clinic*!\n\nRegular dental scaling & hygiene checkups keep your teeth, gums, and smile fresh and healthy. Reply to this message or call us to schedule your 6-month scaling appointment today.\n\nWarm regards,\n*SRA Dental Clinic, Mandi Dabwali*`;
+      window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`, '_blank');
     }
 
     async function loadDashboard() {
@@ -255,6 +281,7 @@
         payment_done: parseFloat(document.getElementById('regPaid').value) || 0,
         discount: parseFloat(document.getElementById('regDiscount').value) || 0,
         next_appointment: document.getElementById('regNextDate').value || null,
+        next_appointment_time: document.getElementById('regNextTime').value || null,
         source: document.getElementById('regSource').value,
         extracted_tooth: document.getElementById('regExtractedTooth').value || null,
         operatory_chair: document.getElementById('regChair').value
@@ -311,7 +338,6 @@
       } catch (e) { alert("Error connecting to server."); }
     }
 
-    // --- DYNAMIC HAND-TYPED CANAL CHARTING ---
     function generateCanalInputs() {
       const tooth = document.getElementById('endoToothNum').value;
       const container = document.getElementById('canalTableContainer');
@@ -412,18 +438,26 @@
         const data = await res.json();
 
         let tHtml = '';
-        data.today.forEach(i => tHtml += `<tr>
-          <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.phone}</td><td>${i.patient_place}</td>
-          <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td><td style="color:red; font-weight:bold;">₹${i.pending_payment}</td>
-        </tr>`);
-        document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="8">No appointments today</td></tr>';
+        data.today.forEach(i => {
+          tHtml += `<tr>
+            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.phone}</td><td>${i.patient_place}</td>
+            <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td>
+            <td style="color:red; font-weight:bold;">₹${i.pending_payment}</td>
+            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', 'Today', '${i.time_slot}')">💬 Today Reminder</button></td>
+          </tr>`;
+        });
+        document.getElementById('todayApptTable').innerHTML = tHtml || '<tr><td colspan="9">No appointments today</td></tr>';
 
         let fHtml = '';
-        data.future.forEach(i => fHtml += `<tr>
-          <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${i.patient_place}</td>
-          <td>${i.procedure}</td><td>${i.operatory_chair}</td><td>${i.time_slot}</td>
-        </tr>`);
-        document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="7">No future appointments scheduled</td></tr>';
+        data.future.forEach(i => {
+          const apptTime = i.next_appointment_time ? i.next_appointment_time : '10:00';
+          fHtml += `<tr>
+            <td><b>${i.opd_number}</b></td><td>${i.patient_name}</td><td>${i.next_appointment}</td><td>${apptTime}</td>
+            <td>${i.patient_place}</td><td>${i.procedure}</td><td>${i.operatory_chair}</td>
+            <td><button class="btn-wa" onclick="send1DayWhatsAppReminder('${i.phone}', '${i.patient_name}', '${i.next_appointment}', '${apptTime}')">💬 1-Day Reminder</button></td>
+          </tr>`;
+        });
+        document.getElementById('futureApptTable').innerHTML = fHtml || '<tr><td colspan="8">No future appointments scheduled</td></tr>';
       } catch (e) { console.error("Error loading appointments"); }
     }
 
@@ -439,7 +473,8 @@
             <td>${p.date}</td><td><b>${p.opd_number}</b></td><td>${p.patient_name}</td><td>${p.patient_place}</td>
             <td>${p.procedure}</td><td>Sitting ${p.current_sitting}/${p.total_sittings}</td><td>${p.chair}</td>
             <td>₹${p.total_amount}</td><td style="color:green;font-weight:bold;">₹${p.total_paid}</td>
-            <td style="color:red;font-weight:bold;">₹${p.payment_left}</td><td>${p.source}</td>
+            <td style="color:red;font-weight:bold;">₹${p.payment_left}</td>
+            <td><button class="btn-wa" onclick="send6MonthScalingRecall('${p.phone}', '${p.patient_name}')">💬 6-Mo Recall</button></td>
             <td><button class="btn-gold" style="padding:4px 8px; font-size:10px;" onclick="document.getElementById('treatOpd').value='${p.opd_number}'; switchTab('treatment'); loadTreatmentDetails();">Operatory Chart</button></td>
           </tr>`;
         });
