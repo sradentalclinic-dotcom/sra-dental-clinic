@@ -1,10 +1,12 @@
 from datetime import date, datetime, timedelta
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Query, Depends
+import os
+from fastapi import FastAPI, HTTPException, Query, Depends, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from sqlalchemy import Column, Date, Float, Integer, String, create_engine
+from sqlalchemy import Column, Date, Float, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
@@ -13,6 +15,8 @@ DATABASE_URL = "sqlite:///./sra_dental.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+os.makedirs("uploads", exist_ok=True)
 
 class ProcedureModel(Base):
     __tablename__ = "procedures"
@@ -40,6 +44,15 @@ class PatientModel(Base):
     next_appointment = Column(Date, nullable=True)
     created_date = Column(Date, default=date.today)
     source = Column(String, default="Website")
+    xray_path = Column(String, nullable=True)
+    extracted_tooth = Column(String, nullable=True)
+
+class EndoChartModel(Base):
+    __tablename__ = "endo_charts"
+    id = Column(Integer, primary_key=True, index=True)
+    opd_number = Column(String, index=True)
+    tooth_number = Column(String)
+    canals_data = Column(Text)
 
 Base.metadata.create_all(bind=engine)
 
@@ -51,6 +64,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 def get_db():
     db = SessionLocal()
@@ -102,11 +117,6 @@ def get_procedures(db: Session = Depends(get_db)):
         procs = db.query(ProcedureModel).all()
     return [{"id": p.id, "name": p.name, "price": p.price, "gap_days": p.gap_days, "total_sittings": p.total_sittings} for p in procs]
 
-@app.get("/calculate-next-date")
-def calculate_next_date(gap_days: int = Query(...)):
-    next_date = date.today() + timedelta(days=gap_days)
-    return {"next_date": next_date.isoformat()}
-
 @app.get("/analytics")
 def get_analytics(db: Session = Depends(get_db)):
     today = date.today()
@@ -153,7 +163,8 @@ def get_appointments(db: Session = Depends(get_db)):
             "pending_payment": p.payment_left,
             "whatsapp_link": wa_link,
             "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
-            "source": p.source
+            "source": p.source,
+            "extracted_tooth": p.extracted_tooth
         }
 
         if p.next_appointment == today:
@@ -185,6 +196,7 @@ class PatientCreate(BaseModel):
     discount: float = 0.0
     next_appointment: Optional[str] = None
     source: str = "Website"
+    extracted_tooth: Optional[str] = None
 
 @app.post("/patients")
 def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
@@ -210,35 +222,42 @@ def create_patient(data: PatientCreate, db: Session = Depends(get_db)):
         payment_left=payment_left,
         time_slot=data.time_slot,
         next_appointment=next_date,
-        source=data.source
+        source=data.source,
+        extracted_tooth=data.extracted_tooth
     )
     db.add(new_patient)
     db.commit()
     return {"message": "Success", "opd_number": opd_number}
 
-class FollowUpCreate(BaseModel):
-    opd_number: str
-    payment_done: float
-    time_slot: str
-    next_appointment: Optional[str] = None
-
-@app.post("/patients/follow-up")
-def follow_up(data: FollowUpCreate, db: Session = Depends(get_db)):
-    patient = db.query(PatientModel).filter(PatientModel.opd_number == data.opd_number).first()
+@app.post("/patients/{opd_number}/upload-xray")
+async def upload_xray(opd_number: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    patient = db.query(PatientModel).filter(PatientModel.opd_number == opd_number).first()
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
-    if data.next_appointment:
-        appt_date = datetime.strptime(data.next_appointment, "%Y-%m-%d").date()
-        if appt_date.weekday() == 6:
-            raise HTTPException(status_code=400, detail="Sunday is reserved for new patients only, no follow-ups allowed!")
-
-    patient.current_sitting += 1
-    patient.total_paid += data.payment_done
-    patient.payment_left = max(0.0, patient.total_amount - patient.total_paid)
-    patient.time_slot = data.time_slot
-    patient.next_appointment = datetime.strptime(data.next_appointment, "%Y-%m-%d").date() if data.next_appointment else None
+    
+    file_path = f"uploads/{opd_number}_{file.filename}"
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+    
+    patient.xray_path = f"/{file_path}"
     db.commit()
-    return {"message": "Follow-up logged"}
+    return {"message": "X-ray uploaded successfully", "xray_path": patient.xray_path}
+
+class EndoSaveRequest(BaseModel):
+    opd_number: str
+    tooth_number: str
+    canals_data: str
+
+@app.post("/patients/endo-chart")
+def save_endo_chart(data: EndoSaveRequest, db: Session = Depends(get_db)):
+    chart = db.query(EndoChartModel).filter(EndoChartModel.opd_number == data.opd_number, EndoChartModel.tooth_number == data.tooth_number).first()
+    if chart:
+        chart.canals_data = data.canals_data
+    else:
+        chart = EndoChartModel(opd_number=data.opd_number, tooth_number=data.tooth_number, canals_data=data.canals_data)
+        db.add(chart)
+    db.commit()
+    return {"message": "Endo chart saved successfully"}
 
 @app.get("/views/daily-log")
 def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
@@ -248,7 +267,8 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             (PatientModel.patient_name.contains(search)) |
             (PatientModel.phone_number.contains(search)) |
             (PatientModel.opd_number.contains(search)) |
-            (PatientModel.patient_place.contains(search))
+            (PatientModel.patient_place.contains(search)) |
+            (PatientModel.extracted_tooth.contains(search))
         )
     patients = query.all()
     logs = []
@@ -269,6 +289,8 @@ def daily_log(search: Optional[str] = None, db: Session = Depends(get_db)):
             "total_paid": p.total_paid,
             "payment_left": p.payment_left,
             "next_appointment": p.next_appointment.isoformat() if p.next_appointment else None,
-            "source": p.source
+            "source": p.source,
+            "xray_path": p.xray_path,
+            "extracted_tooth": p.extracted_tooth
         })
     return logs
