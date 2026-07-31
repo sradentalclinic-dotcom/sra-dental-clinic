@@ -11,13 +11,21 @@ from sqlalchemy import Column, Date, Float, Integer, String, Text, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
-DATABASE_URL = "sqlite:///./sra_dental.db"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+import os
 
-os.makedirs("uploads", exist_ok=True)
+import os
 
+# Uses Render's online database if present, otherwise falls back to local
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sra_dental.db")
+
+# Render uses 'postgres://', but SQLAlchemy requires 'postgresql://'
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Pass check_same_thread ONLY if using SQLite
+connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 class ProcedureModel(Base):
     __tablename__ = "procedures"
     id = Column(Integer, primary_key=True, index=True)
